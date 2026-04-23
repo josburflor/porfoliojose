@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "profile": {
+      "title": "Perfil de Usuario",
+      "description": "Información biográfica y profesional del desarrollador.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Título principal del perfil" },
+        "bio": { "type": "string", "description": "Biografía completa" },
+        "img": { "type": "string", "description": "URL de la imagen de perfil" },
+        "userId": { "type": "string" },
+        "location": { "type": "string" }
+      },
+      "required": ["title", "bio", "img"]
+    },
+    "project": {
+      "title": "Proyecto",
+      "description": "Información sobre un proyecto del portafolio.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "tech": { "type": "array", "items": { "type": "string" } },
+        "img": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "category", "tech", "img"]
+    },
+    "skill": {
+      "title": "Conocimiento",
+      "description": "Habilidad técnica o conocimiento.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "level": { "type": "number" },
+        "icon": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "level", "icon"]
+    },
+    "content": {
+      "title": "Contenido General",
+      "description": "Textos generales de la web (Hero, CTA, etc).",
+      "type": "object",
+      "properties": {
+        "heroTitle1": { "type": "string" },
+        "heroTitle2": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "heroVideoUrl": { "type": "string", "description": "URL de video de Vimeo o YouTube" },
+        "footerText": { "type": "string" },
+        "socialGithub": { "type": "string" },
+        "socialLinkedin": { "type": "string" },
+        "socialInstagram": { "type": "string" },
+        "socialYoutube": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/config/profile": {
+      "schema": "profile",
+      "description": "Configuración del perfil personal."
+    },
+    "/config/general": {
+      "schema": "content",
+      "description": "Textos generales del sitio."
+    },
+    "/projects/{projectId}": {
+      "schema": "project",
+      "description": "Lista de proyectos del portafolio."
+    },
+    "/skills/{skillId}": {
+      "schema": "skill",
+      "description": "Lista de habilidades técnicas."
+    }
+  }
+}
