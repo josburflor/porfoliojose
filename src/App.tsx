@@ -135,9 +135,9 @@ function AppContent() {
   const [services, setServices] = useState<any[]>(INITIAL_SERVICES);
   const [testimonials, setTestimonials] = useState<any[]>(INITIAL_TESTIMONIALS);
   const [general, setGeneral] = useState<any>({
-    heroTitle1: 'ARQUITECTO',
+    heroTitle1: 'DESARROLLADOR',
     heroTitle2: 'DIGITAL',
-    heroSubtitle: 'Construyendo el futuro de la web a través de interfaces inteligentes, sistemas robustos y diseño vanguardista.',
+    heroSubtitle: 'Transformando ideas complejas en infraestructuras digitales eficientes y sistemas de alto rendimiento.',
     heroVideoUrl: 'https://player.vimeo.com/video/1185319571?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&transparent=1',
     socialGithub: 'https://github.com',
     socialLinkedin: 'https://linkedin.com',
@@ -155,10 +155,10 @@ function AppContent() {
     ]
   });
   const [profile, setProfile] = useState({
-    bio: 'Soy un <span class="text-white font-medium">desarrollador web, arquitecto e ingeniero electrónico</span> radicado en España, con más de <span class="text-[#00f2ff]">6 años de experiencia</span> en sistemas de seguridad electrónica, rastreo vehicular satelital y planificación de proyectos.\n\nMe especializo en transformar necesidades reales en <span class="text-white">soluciones técnicas eficientes y seguras</span>, coordinando equipos para cumplir objetivos con precisión arquitectónica.\n\nActualmente integro mi experiencia en ingeniería con el desarrollo digital moderno (<span class="text-white">JavaScript, PHP, WordPress, Figma</span>) para crear plataformas de gestión y control tecnológico de vanguardia.',
+    bio: 'Soy un <span class="text-white font-medium">Desarrollador Digital e Ingeniero</span> radicado en España, especializado en arquitectura de software y soluciones técnicas de alta precisión.\n\nCon experiencia en sistemas de seguridad electrónica y control tecnológico, hoy me enfoco en crear plataformas modernas utilizando <span class="text-white">React, JavaScript, PHP y WordPress</span>.\n\nMi objetivo es fusionar la precisión de la ingeniería con el diseño vanguardista para entregar productos digitales que superen las expectativas del mercado actual.',
     img: 'https://picsum.photos/seed/future/1000/1000',
-    userId: '88219X',
-    location: 'ESPAÑA/UE'
+    userId: 'JOSBUR_DIGITAL',
+    location: 'BURGOS, ESPAÑA'
   });
 
   const handleResetPassword = async () => {
@@ -419,17 +419,17 @@ function AppContent() {
         </motion.div>
 
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="max-w-4xl relative z-10">
-          <h2 className="font-mono text-[20px] font-bold text-[#00f2ff] mb-4 block tracking-[0.5em] uppercase drop-shadow-lg">PORFOLIO</h2>
-          <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter mb-8 glow-text drop-shadow-[0_0_20px_rgba(0,242,255,0.3)]">
+          <h2 className="font-mono text-[12px] sm:text-[16px] md:text-[20px] font-bold text-[#00f2ff] mb-4 block tracking-[0.3em] uppercase drop-shadow-lg">PORFOLIO</h2>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black italic tracking-tighter mb-8 glow-text drop-shadow-[0_0_20px_rgba(0,242,255,0.3)] leading-[0.9]">
             {general.heroTitle1} <br /> <span className="text-[#00f2ff]">{general.heroTitle2}</span>
           </h1>
-          <p className="text-[20px] text-white font-bold max-w-2xl mx-auto mb-12 drop-shadow-md leading-relaxed">
+          <p className="text-[14px] sm:text-[18px] md:text-[20px] text-white/90 font-medium max-w-2xl mx-auto mb-12 drop-shadow-md leading-relaxed px-4">
             {general.heroSubtitle}
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 px-8">
             <a 
               href="#proyectos" 
-              className="px-12 py-5 font-mono text-[18px] font-bold border border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all uppercase tracking-widest bg-[#00f2ff]/5 backdrop-blur-sm text-[#00f2ff] text-center hover:bg-[#00f2ff]/10 shadow-[0_0_20px_rgba(0,242,255,0.05)]"
+              className="w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 font-mono text-[14px] md:text-[18px] font-bold border border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all uppercase tracking-widest bg-[#00f2ff]/5 backdrop-blur-sm text-[#00f2ff] text-center hover:bg-[#00f2ff]/10 shadow-[0_0_20px_rgba(0,242,255,0.05)]"
             >
               Acceder Proyectos
             </a>
@@ -444,7 +444,7 @@ function AppContent() {
                   alert('El currículo se está cargando o no ha sido subido aún.');
                 }
               }}
-              className={`px-12 py-5 font-mono text-[18px] font-bold border border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all uppercase tracking-widest bg-[#00f2ff]/5 backdrop-blur-sm text-[#00f2ff] text-center hover:bg-[#00f2ff]/10 shadow-[0_0_20px_rgba(0,242,255,0.05)] ${!general.cvUrl ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              className={`w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 font-mono text-[14px] md:text-[18px] font-bold border border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all uppercase tracking-widest bg-[#00f2ff]/5 backdrop-blur-sm text-[#00f2ff] text-center hover:bg-[#00f2ff]/10 shadow-[0_0_20px_rgba(0,242,255,0.05)] ${!general.cvUrl ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               Currículo
             </a>
@@ -453,13 +453,13 @@ function AppContent() {
       </section>
 
       {/* Perfil: Neural Core */}
-      <section id="perfil" className="py-32 px-8">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-8">
+      <section id="perfil" className="py-20 md:py-32 px-8">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="space-y-6 md:space-y-8">
             <div className="w-12 h-1 bg-[#00f2ff]" />
-            <h2 className="text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">SOBRE MI PERSONA</h2>
-            <div className="space-y-8 h-full max-h-[500px] overflow-y-auto pr-4 custom-scrollbar lg:max-h-none">
-              <div className="space-y-6 text-gray-400 font-light text-lg text-justify whitespace-pre-wrap leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">SOBRE MI PERSONA</h2>
+            <div className="space-y-8 h-full max-h-[400px] md:max-h-[500px] overflow-y-auto pr-4 custom-scrollbar lg:max-h-none">
+              <div className="space-y-6 text-gray-400 font-light text-base md:text-lg text-justify whitespace-pre-wrap leading-relaxed">
                 {typeof profile.bio === 'string' ? (
                   <div dangerouslySetInnerHTML={{ __html: profile.bio }} />
                 ) : Array.isArray(profile.bio) ? (
@@ -472,7 +472,7 @@ function AppContent() {
           </div>
           <div className="relative">
             <div className="aspect-square glass-panel p-1 border-[#00f2ff]/30 border shadow-[0_0_50px_rgba(0,242,255,0.1)]">
-               <img src={profile.img} alt="Burgos Diseño - Arquitecto Digital y Desarrollador Web" className="w-full h-full object-cover grayscale brightness-75" referrerPolicy="no-referrer" />
+               <img src={profile.img} alt="Burgos Diseño - Desarrollador Digital y Desarrollador Web" className="w-full h-full object-cover grayscale brightness-75" referrerPolicy="no-referrer" />
             </div>
             <div className="absolute -top-4 -right-4 p-4 glass-panel font-mono text-[9px] text-[#00f2ff]">
               ID_USUARIO: {profile.userId}<br/>LATENCIA: 4MS<br/>LOC: {profile.location}
@@ -481,11 +481,11 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="conocimientos" className="py-32 px-8 bg-black/40">
+      <section id="conocimientos" className="py-20 md:py-32 px-8 bg-black/40">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-20 space-y-8">
+          <div className="mb-12 md:mb-20 space-y-6 md:space-y-8">
             <div className="w-12 h-1 bg-[#00f2ff]" />
-            <h2 className="text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">CONOCIMIENTOS</h2>
+            <h2 className="text-3xl md:text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">CONOCIMIENTOS</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {visibleSkills.map((s, idx) => (
@@ -517,9 +517,9 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="proyectos" className="py-32 px-8">
+      <section id="proyectos" className="py-20 md:py-32 px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16 gap-8">
             <div className="space-y-8">
               <div className="w-12 h-1 bg-[#00f2ff]" />
               <h2 className="text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">PROYECTOS</h2>
@@ -851,15 +851,32 @@ function AppContent() {
 
       </main>
 
-      <footer className="py-12 px-8 flex flex-col items-center gap-8 border-t border-white/5">
-        <div className="flex flex-col items-center gap-2">
-          <div className="font-mono text-[9px] text-gray-600 tracking-[0.4em] uppercase text-center">Conexión Segura // 2026 Burgos Diseño ✨</div>
-          <div className="font-mono text-[11px] text-[#00f2ff] tracking-widest uppercase">TEL: +34 613 476 029</div>
+      <footer className="py-12 px-8 flex flex-col items-center gap-8 border-t border-white/5 bg-black/40 relative overflow-hidden">
+        {/* Cyber decoration */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-px bg-gradient-to-r from-transparent via-[#00f2ff]/50 to-transparent" />
+        
+        <div className="flex flex-col items-center gap-4">
+          <div className="font-mono text-[10px] text-gray-500 tracking-[0.5em] uppercase text-center">Protocolo de Identidad // 2026 Burgos Studio ✨</div>
+          <div className="flex items-center gap-6">
+            <div className="font-mono text-[11px] text-[#00f2ff] tracking-widest uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#00f2ff] animate-pulse" /> +34 613 476 029
+            </div>
+            
+            {/* Admin Entry/Exit Button */}
+            <button 
+              onClick={() => user ? logout() : setShowLogin(true)} 
+              className="flex items-center gap-2 px-4 py-1.5 border border-[#00f2ff]/20 hover:border-[#00f2ff] bg-white/5 font-mono text-[9px] text-white/50 hover:text-[#00f2ff] transition-all uppercase tracking-widest group"
+            >
+              {user ? <LogOut size={12} className="group-hover:rotate-180 transition-transform" /> : <LogIn size={12} />}
+              {user ? 'Cerrar_Enlace' : 'Acceso_Privado'}
+            </button>
+          </div>
         </div>
-        <div className="flex gap-8">
-           <a href="https://github.com/josburflor" target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="GitHub"><Github size={20} /></a>
-           <a href="https://www.linkedin.com/in/joseburgosflores/" target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="LinkedIn"><Linkedin size={20} /></a>
-           <a href="https://www.instagram.com/josburflor/" target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="Instagram"><Instagram size={20} /></a>
+            {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="GitHub"><Github size={20} /></a>}
+            {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="LinkedIn"><Linkedin size={20} /></a>}
+            {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="Instagram"><Instagram size={20} /></a>}
+            {general.socialYoutube && <a href={ensureAbsoluteUrl(general.socialYoutube)} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff0000] transition-all" aria-label="YouTube"><Youtube size={20} /></a>}
+          </div>
         </div>
       </footer>
 
@@ -876,10 +893,10 @@ function AppContent() {
         href="https://wa.me/34613476029" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="fixed left-6 bottom-6 z-[160] w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-90 transition-all group"
+        className="fixed left-4 bottom-4 md:left-6 md:bottom-6 z-[160] w-12 h-12 md:w-14 md:h-14 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-90 transition-all group"
       >
-        <MessageCircle size={28} />
-        <span className="absolute left-16 bg-black/90 border border-white/10 px-4 py-2 rounded font-mono text-[10px] text-[#25D366] uppercase tracking-widest whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <MessageCircle size={24} className="md:w-7 md:h-7" />
+        <span className="absolute left-16 bg-black/90 border border-white/10 px-4 py-2 rounded font-mono text-[10px] text-[#25D366] uppercase tracking-widest whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity hidden md:block pointer-events-none">
           Contactar por WhatsApp
         </span>
       </a>

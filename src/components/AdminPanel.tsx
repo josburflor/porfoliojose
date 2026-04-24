@@ -107,8 +107,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
-      <div className="bg-[#080808] border border-[#00f2ff]/20 w-full max-w-6xl h-[85vh] flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-2 md:p-4">
+      <div className="bg-[#080808] border border-[#00f2ff]/20 w-full max-w-6xl h-[95vh] md:h-[85vh] flex flex-col relative">
         
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/50">
@@ -122,22 +122,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
           </div>
         </div>
 
-        {/* Tab Selector */}
-        <div className="flex border-b border-white/5 bg-black/20 overflow-x-auto no-scrollbar">
+        {/* Tab Selector - Responsive with horizontal scroll */}
+        <div className="flex border-b border-white/5 bg-black/20 overflow-x-auto no-scrollbar scroll-smooth snap-x">
           {tabs.map(t => (
             <button 
               key={t.id}
               onClick={() => setActiveTab(t.id as any)}
-              className={`flex items-center gap-2 px-6 py-4 font-mono text-[9px] uppercase tracking-widest transition-all relative ${activeTab === t.id ? 'text-[#00f2ff]' : 'text-white/40 hover:text-white'}`}
+              className={`flex items-center gap-2 px-6 py-4 font-mono text-[10px] uppercase tracking-widest transition-all relative whitespace-nowrap snap-start ${activeTab === t.id ? 'text-[#00f2ff]' : 'text-white/40 hover:text-white'}`}
             >
-              {t.icon} {t.label}
+              <span className="opacity-70">{t.icon}</span> {t.label}
               {activeTab === t.id && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />}
             </button>
           ))}
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
           <AnimatePresence>
             {contMsg.text && (
               <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 border font-mono text-[9px] uppercase tracking-[0.2em] backdrop-blur-xl ${contMsg.type === 'success' ? 'bg-green-500/10 border-green-500/50 text-green-400' : 'bg-red-500/10 border-red-500/50 text-red-400'}`}>
@@ -295,8 +295,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   
                   <div className="space-y-2">
                     <label className="text-[9px] font-mono uppercase text-gray-500 tracking-widest">Imagen del Servicio (Jerárquica)</label>
-                    <div className="flex gap-4 items-center bg-black/30 p-4 border border-white/5">
-                      {editingService.img && <img src={editingService.img} className="w-20 h-12 object-cover border border-[#00f2ff]/30" />}
+                    <div className="flex flex-col sm:flex-row gap-4 items-center bg-black/30 p-4 border border-white/5">
+                      {editingService.img && <img src={editingService.img} className="w-full sm:w-20 h-24 sm:h-12 object-cover border border-[#00f2ff]/30" />}
                       <input type="file" accept="image/*" onChange={(e) => {
                         const f = e.target.files?.[0];
                         if (f) {
@@ -353,21 +353,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   <div className="text-center py-20 border border-dashed border-white/10 font-mono text-[10px] text-white/20 uppercase">No hay testimonios registrados</div>
                 ) : testimonials.map(t => (
                   <div key={t.id} className="bg-white/5 border border-white/10 p-6 flex justify-between items-center group">
-                    <div className="flex gap-6 items-center">
-                      <div className="w-12 h-12 bg-[#00f2ff]/10 flex items-center justify-center font-mono text-xs text-[#00f2ff]">
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
+                      <div className="w-12 h-12 bg-[#00f2ff]/10 flex-shrink-0 flex items-center justify-center font-mono text-xs text-[#00f2ff]">
                         {t.name?.charAt(0)}
                       </div>
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
+                      <div className="text-center sm:text-left flex-1">
+                        <div className="flex flex-col sm:flex-row items-center gap-3 mb-1">
                           <p className="font-bold text-[10px] uppercase tracking-widest">{t.name}</p>
                           <div className="flex gap-0.5">
                             {[...Array(5)].map((_, i) => <Star key={i} size={8} className={i < (t.rating || 5) ? 'fill-[#00f2ff] text-[#00f2ff]' : 'text-white/10'} />)}
                           </div>
                         </div>
-                        <p className="text-[11px] text-white/60 italic max-w-xl">"{t.comment}"</p>
+                        <p className="text-[11px] text-white/60 italic">"{t.comment}"</p>
                       </div>
                     </div>
-                    <button onClick={() => handleDelete('testimonials', t.id)} className="p-4 text-white/10 group-hover:text-red-500 transition-colors" title="Eliminar Comentario">
+                    <button onClick={() => handleDelete('testimonials', t.id)} className="p-4 text-white/10 group-hover:text-red-500 transition-colors ml-4" title="Eliminar Comentario">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -376,14 +376,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
             </div>
           )}
 
-          {/* CONTENIDO (HERO & PERFIL) */}
+          {/* CONTENIDO (HERO, PERFIL Y REDES) */}
           {activeTab === 'contenido' && (
             <div className="space-y-12">
+              {/* HERO SECTION */}
               <div className="bg-white/5 border border-white/10 p-8 space-y-8">
                 <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Personalización Hero</h3>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <input type="text" placeholder="Título 1" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="bg-black/50 border border-white/10 p-4 text-xs text-white" />
-                  <input type="text" placeholder="Título 2" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 1</label>
+                    <input type="text" placeholder="Título 1" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 2</label>
+                    <input type="text" placeholder="Título 2" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -393,24 +400,65 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   <div className="space-y-2">
                     <label className="text-[8px] font-mono text-gray-500 uppercase">Fondo Alternativo (Subir)</label>
                     <div className="flex gap-4 items-center bg-black/30 p-4 border border-white/5">
+                      {genData.heroBgImg && <img src={genData.heroBgImg} className="w-12 h-12 object-cover border border-white/10" />}
                       <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} className="text-[9px]" />
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* SOCIAL & IDENTITY */}
               <div className="bg-white/5 border border-white/10 p-8 space-y-8">
-                <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Perfil de Usuario</h3>
-                <div className="flex gap-6 items-center mb-6">
-                  <img src={profData.img} className="w-20 h-20 object-cover border border-[#00f2ff]/30 rounded-full" />
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'profile')} className="text-[10px]" />
+                <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Identidad y Redes Sociales</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">GitHub URL</label>
+                    <input type="text" value={genData.socialGithub} onChange={e => setGenData({...genData, socialGithub: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">LinkedIn URL</label>
+                    <input type="text" value={genData.socialLinkedin} onChange={e => setGenData({...genData, socialLinkedin: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Instagram URL</label>
+                    <input type="text" value={genData.socialInstagram} onChange={e => setGenData({...genData, socialInstagram: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">YouTube URL</label>
+                    <input type="text" value={genData.socialYoutube} onChange={e => setGenData({...genData, socialYoutube: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
                 </div>
-                <textarea value={profData.bio} onChange={e => setProfData({...profData, bio: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white h-48 resize-none font-mono" />
+                <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">ID de Usuario</label>
+                    <input type="text" value={profData.userId} onChange={e => setProfData({...profData, userId: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Ubicación</label>
+                    <input type="text" value={profData.location} onChange={e => setProfData({...profData, location: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex justify-end">
-                <button onClick={handleUpdateContent} disabled={isSaving} className="cyber-button px-12 py-4 flex items-center gap-2">
-                  <Save size={16} /> {isSaving ? 'Guardando...' : 'Guardar Cambios de Contenido'}
+              {/* PROFILE SECTION */}
+              <div className="bg-white/5 border border-white/10 p-8 space-y-8">
+                <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Biografía y Foto de Perfil</h3>
+                <div className="flex flex-col sm:flex-row gap-6 items-center mb-6 bg-black/20 p-4">
+                  <img src={profData.img} className="w-24 h-24 object-cover border border-[#00f2ff]/30 rounded-full" />
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Actualizar Foto</label>
+                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'profile')} className="text-[10px] text-white/50" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[8px] font-mono text-gray-500 uppercase">Bio (HTML Permitido)</label>
+                  <textarea value={profData.bio} onChange={e => setProfData({...profData, bio: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white h-48 resize-none font-mono" placeholder="Usa etiquetas <span> para destacar texto..." />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 sticky bottom-0 bg-[#080808] py-4 border-t border-white/5 z-20">
+                <button onClick={handleUpdateContent} disabled={isSaving} className="cyber-button w-full sm:w-auto px-12 py-4 flex items-center justify-center gap-2">
+                  <Save size={16} /> {isSaving ? 'Guardando...' : 'Sincronizar Todo el Contenido'}
                 </button>
               </div>
             </div>
@@ -453,21 +501,67 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
           {/* SEGURIDAD */}
           {activeTab === 'seguridad' && (
             <div className="max-w-xl bg-white/5 border border-white/10 p-8 space-y-6">
-              <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Control de Acceso</h3>
-              <input type="email" placeholder="Nuevo Email" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
-              <button onClick={async () => {
-                try { await updateEmail(user!, newEmail); setSecMsg({type:'success', text:'Email actualizado.'}); }
-                catch (e: any) { setSecMsg({type:'error', text: e.message}); }
-              }} className="w-full border border-[#00f2ff]/30 py-3 text-[#00f2ff] text-[10px] font-mono uppercase">Actualizar Email</button>
-              
-              <div className="pt-6 border-t border-white/10">
-                <input type="password" placeholder="Nueva Contraseña" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
-                <button onClick={async () => {
-                  try { await updatePassword(user!, newPassword); setSecMsg({type:'success', text:'Clave actualizada.'}); }
-                  catch (e: any) { setSecMsg({type:'error', text: e.message}); }
-                }} className="w-full border border-[#00f2ff]/30 py-3 text-[#00f2ff] text-[10px] font-mono uppercase mt-4">Cambiar Clave</button>
+              <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Control de Acceso Crítico</h3>
+              <div className="p-4 bg-blue-500/5 border border-blue-500/20 mb-6">
+                <p className="font-mono text-[9px] text-blue-300 leading-relaxed uppercase">
+                  Nota: Por seguridad, Firebase puede requerir un inicio de sesión reciente para cambiar el email o la contraseña. Si recibes un error, cierra sesión e ingresa de nuevo.
+                </p>
               </div>
-              {secMsg.text && <div className={`p-4 text-[9px] uppercase border ${secMsg.type === 'success' ? 'border-green-500/30 text-green-400' : 'border-red-500/30 text-red-400'}`}>{secMsg.text}</div>}
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[8px] font-mono text-gray-500 uppercase">Nuevo Email del Administrador</label>
+                  <input type="email" placeholder="ejemplo@correo.com" value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+                </div>
+                <button 
+                  onClick={async () => {
+                    if (!newEmail) return;
+                    setSecMsg({type:'info', text:'Procesando cambio de email...'});
+                    try { 
+                      await updateEmail(user!, newEmail); 
+                      setSecMsg({type:'success', text:'Email actualizado correctamente.'}); 
+                    } catch (e: any) { 
+                      const msg = e.code === 'auth/requires-recent-login' ? 'Error: Debes re-autenticarte (Log Out/Log In) para cambiar el email.' : e.message;
+                      setSecMsg({type:'error', text: msg}); 
+                    }
+                  }} 
+                  className="w-full border border-[#00f2ff]/30 py-3 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/10 transition-all"
+                >
+                  Actualizar Protocolo de Email
+                </button>
+              </div>
+              
+              <div className="pt-6 border-t border-white/10 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[8px] font-mono text-gray-500 uppercase">Nueva Clave de Acceso</label>
+                  <input type="password" placeholder="Mínimo 6 caracteres" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+                </div>
+                <button 
+                  onClick={async () => {
+                    if (!newPassword) return;
+                    setSecMsg({type:'info', text:'Procesando cambio de clave...'});
+                    try { 
+                      await updatePassword(user!, newPassword); 
+                      setSecMsg({type:'success', text:'Clave de acceso actualizada.'}); 
+                    } catch (e: any) { 
+                      const msg = e.code === 'auth/requires-recent-login' ? 'Error: Debes re-autenticarte (Log Out/Log In) para cambiar la contraseña.' : e.message;
+                      setSecMsg({type:'error', text: msg}); 
+                    }
+                  }} 
+                  className="w-full border border-[#00f2ff]/30 py-3 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/10 transition-all"
+                >
+                  Actualizar Clave Maestra
+                </button>
+              </div>
+              {secMsg.text && (
+                <div className={`p-4 text-[9px] uppercase border animate-pulse ${
+                  secMsg.type === 'success' ? 'border-green-500/30 text-green-400 bg-green-500/5' : 
+                  secMsg.type === 'info' ? 'border-blue-500/30 text-blue-400 bg-blue-500/5' :
+                  'border-red-500/30 text-red-400 bg-red-500/5'
+                }`}>
+                  {secMsg.text}
+                </div>
+              )}
             </div>
           )}
         </div>

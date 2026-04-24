@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     loading,
-    isAdmin: true, // TEMPORAL: Acceso total para desarrollo
+    isAdmin: user?.email === "josburia2@gmail.com",
     login,
     resetPassword,
     logout
