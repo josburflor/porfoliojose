@@ -57,10 +57,54 @@ const INITIAL_SKILLS = [
 ];
 
 const PROJECTS = [
-  { id: 'init-p1', title: 'EXPLORADOR NEURAL', cat: 'App', tech: ['React', 'IA'], img: 'https://picsum.photos/seed/cyber1/800/600' },
-  { id: 'init-p2', title: 'DISEÑO ZENITH', cat: 'Diseño Web', tech: ['Next.js', 'Tailwind'], img: 'https://picsum.photos/seed/cyber2/800/600' },
-  { id: 'init-p3', title: 'LOGOTIPO VECTOR', cat: 'Illustrator', tech: ['Vectores', 'Branding'], img: 'https://picsum.photos/seed/cyber3/800/600' },
-  { id: 'init-p4', title: 'MAQUETA ORION', cat: 'Figma', tech: ['UX/UI', 'Prototipo'], img: 'https://picsum.photos/seed/cyber4/800/600' },
+  { 
+    id: 'init-p1', 
+    title: 'E-COMMERCE PRESTASHOP', 
+    cat: 'Prestashop', 
+    tech: ['Prestashop', 'PHP', 'MySQL'], 
+    img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800',
+    description: 'Plataforma de comercio electrónico de alta disponibilidad con integración de pagos segura y gestión de inventario automatizada.',
+    link: '#'
+  },
+  { 
+    id: 'init-p2', 
+    title: 'DASHBOARD UX/UI', 
+    cat: 'Diseño UX/UI', 
+    tech: ['Figma', 'Prototipado'], 
+    img: 'https://images.unsplash.com/photo-1581291518062-c067756f642a?auto=format&fit=crop&q=80&w=800',
+    description: 'Sistema de analíticas con enfoque en la experiencia de usuario, optimizando flujos de navegación complejos.',
+    link: '#'
+  },
+  { 
+    id: 'init-p3', 
+    title: 'APP CORPORATIVA', 
+    cat: 'App', 
+    tech: ['React Native', 'Firebase'], 
+    img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800',
+    description: 'Aplicación móvil híbrida para la gestión de equipos remotos y comunicación interna cifrada.',
+    link: '#'
+  }
+];
+
+const INITIAL_SERVICES = [
+  {
+    id: 's1',
+    title: 'DESARROLLO WEB PREMIUM',
+    price: '999€',
+    description: 'Sitios web de alto rendimiento diseñados para convertir visitas en clientes reales.',
+    features: ['Diseño Responsivo', 'SEO Optimizado', 'Hosting Incluido', 'Soporte 24/7'],
+    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800'
+  }
+];
+
+const INITIAL_TESTIMONIALS = [
+  {
+    id: 't1',
+    name: 'Gisselle Flores',
+    comment: 'La precisión técnica y el diseño futurista de Burgos Diseño han llevado nuestro proyecto a otro nivel. Altamente recomendado.',
+    rating: 5,
+    date: '10/04/2026'
+  }
 ];
 
 export default function App() {
@@ -85,11 +129,11 @@ function AppContent() {
   const [loginError, setLoginError] = useState('');
   const [resetSent, setResetSent] = useState(false);
 
-  // Dynamic Data States
-  const [projects, setProjects] = useState<any[]>([]);
-  const [skills, setSkills] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
-  const [testimonials, setTestimonials] = useState<any[]>([]);
+  // Dynamic Data States with Fallback
+  const [projects, setProjects] = useState<any[]>(PROJECTS);
+  const [skills, setSkills] = useState<any[]>(INITIAL_SKILLS);
+  const [services, setServices] = useState<any[]>(INITIAL_SERVICES);
+  const [testimonials, setTestimonials] = useState<any[]>(INITIAL_TESTIMONIALS);
   const [general, setGeneral] = useState<any>({
     heroTitle1: 'ARQUITECTO',
     heroTitle2: 'DIGITAL',
@@ -161,10 +205,22 @@ function AppContent() {
       if (snap.exists()) setProfile((prev: any) => ({ ...prev, ...snap.data() }));
     });
 
-    const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-    const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-    const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-    const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+    const unsubProjects = onSnapshot(collection(db, 'projects'), 
+      (s) => { if (!s.empty) setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
+      (err) => console.warn("Firestore projects quota likely exceeded, using local fallback.")
+    );
+    const unsubSkills = onSnapshot(collection(db, 'skills'), 
+      (s) => { if (!s.empty) setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
+      (err) => console.warn("Firestore skills quota likely exceeded.")
+    );
+    const unsubServices = onSnapshot(collection(db, 'services'), 
+      (s) => { if (!s.empty) setServices(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
+      (err) => console.warn("Firestore services quota likely exceeded.")
+    );
+    const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), 
+      (s) => { if (!s.empty) setTestimonials(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
+      (err) => console.warn("Firestore testimonials quota likely exceeded.")
+    );
 
     return () => {
       unsubGen();
@@ -238,7 +294,7 @@ function AppContent() {
     }
   }, [isAdmin]);
 
-  const categories = ['Todos', 'Figma', 'Photoshop', 'Illustrator', 'WordPress', 'PrestaShop', 'Diseño Web', 'App'];
+  const categories = ['Todos', 'App', 'Diseño Web', 'Wordpress', 'Figma', 'Diseño UX/UI', 'Prestashop'];
   
   const visibleSkills = useMemo(() => {
     return skills.filter(s => !general.hiddenIds?.includes(s.id));
