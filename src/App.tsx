@@ -871,7 +871,7 @@ function AppContent() {
               {user ? 'Cerrar_Enlace' : 'Acceso_Privado'}
             </button>
           </div>
-        </div>
+          <div className="flex gap-8">
             {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="GitHub"><Github size={20} /></a>}
             {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="LinkedIn"><Linkedin size={20} /></a>}
             {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="hover:text-[#00f2ff] transition-all" aria-label="Instagram"><Instagram size={20} /></a>}
