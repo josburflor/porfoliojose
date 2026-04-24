@@ -808,6 +808,26 @@ function AppContent() {
                   <button type="submit" className="cyber-button w-full py-4 flex items-center justify-center gap-2 uppercase tracking-widest">
                     Autenticar_Sistema <ShieldCheck size={16} />
                   </button>
+                  
+                  {/* Emergency Init Button - Technical Solution */}
+                  <button 
+                    type="button"
+                    onClick={async () => {
+                      if (!email || !password) { setLoginError('Escribe email y clave para inicializar.'); return; }
+                      try {
+                        const { createUserWithEmailAndPassword } = await import('firebase/auth');
+                        const { auth } = await import('./firebase');
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        alert('¡SISTEMA INICIALIZADO! Usuario creado con éxito. Ahora ya puedes entrar.');
+                      } catch (err: any) {
+                        setLoginError('Error de Init: ' + err.message);
+                      }
+                    }}
+                    className="w-full mt-4 border border-[#00f2ff]/20 py-2 font-mono text-[8px] text-[#00f2ff]/40 hover:text-[#00f2ff] hover:bg-[#00f2ff]/5 uppercase tracking-[0.2em] transition-all"
+                  >
+                    [ INICIALIZAR_PROTOCOLO_ADMIN ]
+                  </button>
+
                   <button 
                     type="button" 
                     onClick={() => setIsResetting(true)}
