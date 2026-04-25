@@ -30,6 +30,7 @@ import { AuthProvider, useAuth } from './AuthContext';
 import { db } from './firebase';
 import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc } from 'firebase/firestore';
 import { AdminPanel } from './components/AdminPanel';
+import { BACKUP_PROFILE, BACKUP_GENERAL, BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';
 
 // --- Icon Mapping Utility ---
 const IconMap: Record<string, any> = {
@@ -44,68 +45,7 @@ const IconMap: Record<string, any> = {
   terminal: <Terminal size={18} />,
 };
 
-// --- Static Data (Fallback) ---
-const INITIAL_SKILLS = [
-  { id: 'init-s1', name: 'Frontend con frameworks (GITHUB)', level: 95, icon: 'github' },
-  { id: 'init-s2', name: 'Inteligencia Artificial', level: 85, icon: 'cpu' },
-  { id: 'init-s3', name: 'Diseño web con HTML5 y CSS', level: 98, icon: 'globe' },
-  { id: 'init-s4', name: 'Diseño UX/UI con Figma', level: 90, icon: 'figma' },
-  { id: 'init-s5', name: 'Javascript y ReactJs', level: 92, icon: 'code' },
-  { id: 'init-s6', name: 'Adobe Illustrator Photoshop', level: 85, icon: 'layers' },
-  { id: 'init-s7', name: 'Capcut', level: 80, icon: 'zap' },
-  { id: 'init-s8', name: 'Aplicaciones web con PHP y MySQL', level: 88, icon: 'box' },
-];
-
-const PROJECTS = [
-  { 
-    id: 'init-p1', 
-    title: 'E-COMMERCE PRESTASHOP', 
-    cat: 'Prestashop', 
-    tech: ['Prestashop', 'PHP', 'MySQL'], 
-    img: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800',
-    description: 'Plataforma de comercio electrónico de alta disponibilidad con integración de pagos segura y gestión de inventario automatizada.',
-    link: '#'
-  },
-  { 
-    id: 'init-p2', 
-    title: 'DASHBOARD UX/UI', 
-    cat: 'Diseño UX/UI', 
-    tech: ['Figma', 'Prototipado'], 
-    img: 'https://images.unsplash.com/photo-1581291518062-c067756f642a?auto=format&fit=crop&q=80&w=800',
-    description: 'Sistema de analíticas con enfoque en la experiencia de usuario, optimizando flujos de navegación complejos.',
-    link: '#'
-  },
-  { 
-    id: 'init-p3', 
-    title: 'APP CORPORATIVA', 
-    cat: 'App', 
-    tech: ['React Native', 'Firebase'], 
-    img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800',
-    description: 'Aplicación móvil híbrida para la gestión de equipos remotos y comunicación interna cifrada.',
-    link: '#'
-  }
-];
-
-const INITIAL_SERVICES = [
-  {
-    id: 's1',
-    title: 'DESARROLLO WEB PREMIUM',
-    price: '999€',
-    description: 'Sitios web de alto rendimiento diseñados para convertir visitas en clientes reales.',
-    features: ['Diseño Responsivo', 'SEO Optimizado', 'Hosting Incluido', 'Soporte 24/7'],
-    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800'
-  }
-];
-
-const INITIAL_TESTIMONIALS = [
-  {
-    id: 't1',
-    name: 'Gisselle Flores',
-    comment: 'La precisión técnica y el diseño futurista de Burgos Diseño han llevado nuestro proyecto a otro nivel. Altamente recomendado.',
-    rating: 5,
-    date: '10/04/2026'
-  }
-];
+// --- App Component ---
 
 export default function App() {
   return (
@@ -130,36 +70,12 @@ function AppContent() {
   const [resetSent, setResetSent] = useState(false);
 
   // Dynamic Data States with Fallback
-  const [projects, setProjects] = useState<any[]>(PROJECTS);
-  const [skills, setSkills] = useState<any[]>(INITIAL_SKILLS);
-  const [services, setServices] = useState<any[]>(INITIAL_SERVICES);
-  const [testimonials, setTestimonials] = useState<any[]>(INITIAL_TESTIMONIALS);
-  const [general, setGeneral] = useState<any>({
-    heroTitle1: 'DESARROLLADOR',
-    heroTitle2: 'DIGITAL',
-    heroSubtitle: 'Transformando ideas complejas en infraestructuras digitales eficientes y sistemas de alto rendimiento.',
-    heroVideoUrl: 'https://player.vimeo.com/video/1185319571?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&transparent=1',
-    socialGithub: 'https://github.com',
-    socialLinkedin: 'https://linkedin.com',
-    socialInstagram: 'https://instagram.com',
-    socialYoutube: 'https://youtube.com',
-    hiddenIds: [],
-    cvUrl: '',
-    menuItems: [
-      { label: 'Inicio', link: '#inicio' },
-      { label: 'Servicios', link: '#servicios' },
-      { label: 'Perfil', link: '#perfil' },
-      { label: 'Proyectos', link: '#proyectos' },
-      { label: 'Testimonios', link: '#testimonios' },
-      { label: 'Currículo', link: 'cv' }
-    ]
-  });
-  const [profile, setProfile] = useState({
-    bio: 'Soy un <span class="text-white font-medium">Desarrollador Digital e Ingeniero</span> radicado en España, especializado en arquitectura de software y soluciones técnicas de alta precisión.\n\nCon experiencia en sistemas de seguridad electrónica y control tecnológico, hoy me enfoco en crear plataformas modernas utilizando <span class="text-white">React, JavaScript, PHP y WordPress</span>.\n\nMi objetivo es fusionar la precisión de la ingeniería con el diseño vanguardista para entregar productos digitales que superen las expectativas del mercado actual.',
-    img: 'https://picsum.photos/seed/future/1000/1000',
-    userId: 'JOSBUR_DIGITAL',
-    location: 'BURGOS, ESPAÑA'
-  });
+  const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
+  const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
+  const [services, setServices] = useState<any[]>([]); // Se cargará dinámicamente
+  const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
+  const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
+  const [profile, setProfile] = useState(BACKUP_PROFILE);
 
   const handleResetPassword = async () => {
     if (!email) {
@@ -194,43 +110,73 @@ function AppContent() {
   };
 
   useEffect(() => {
-    const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        setGeneral((prev: any) => ({ ...prev, ...data }));
+    // Patrón de recuperación con caché para ahorrar lecturas
+    const loadData = async () => {
+      const CACHE_KEY = 'josbur_portfolio_data';
+      const CACHE_EXPIRY = 3600000; // 1 hora
+      const now = Date.now();
+      
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        setGeneral(data.general);
+        setProfile(data.profile);
+        setProjects(data.projects);
+        setSkills(data.skills);
+        setServices(data.services);
+        setTestimonials(data.testimonials);
+        
+        // Si la caché es reciente, no consultamos Firestore
+        if (now - timestamp < CACHE_EXPIRY && !isAdmin) return;
       }
-    });
 
-    const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => {
-      if (snap.exists()) setProfile((prev: any) => ({ ...prev, ...snap.data() }));
-    });
+      // Si no hay caché o ha expirado, o es admin, consultamos Firestore una sola vez
+      try {
+        const [genS, profS, projS, skillS, servS, testS] = await Promise.all([
+          getDoc(doc(db, 'config', 'general')),
+          getDoc(doc(db, 'config', 'profile')),
+          getDocs(collection(db, 'projects')),
+          getDocs(collection(db, 'skills')),
+          getDocs(collection(db, 'services')),
+          getDocs(collection(db, 'testimonials'))
+        ]);
 
-    const unsubProjects = onSnapshot(collection(db, 'projects'), 
-      (s) => { if (!s.empty) setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
-      (err) => console.warn("Firestore projects quota likely exceeded, using local fallback.")
-    );
-    const unsubSkills = onSnapshot(collection(db, 'skills'), 
-      (s) => { if (!s.empty) setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
-      (err) => console.warn("Firestore skills quota likely exceeded.")
-    );
-    const unsubServices = onSnapshot(collection(db, 'services'), 
-      (s) => { if (!s.empty) setServices(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
-      (err) => console.warn("Firestore services quota likely exceeded.")
-    );
-    const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), 
-      (s) => { if (!s.empty) setTestimonials(s.docs.map(d => ({ id: d.id, ...d.data() }))); },
-      (err) => console.warn("Firestore testimonials quota likely exceeded.")
-    );
+        const newData = {
+          general: genS.exists() ? genS.data() : BACKUP_GENERAL,
+          profile: profS.exists() ? profS.data() : BACKUP_PROFILE,
+          projects: projS.empty ? BACKUP_PROJECTS : projS.docs.map(d => ({ id: d.id, ...d.data() })),
+          skills: skillS.empty ? BACKUP_SKILLS : skillS.docs.map(d => ({ id: d.id, ...d.data() })),
+          services: servS.empty ? [] : servS.docs.map(d => ({ id: d.id, ...d.data() })),
+          testimonials: testS.empty ? [] : testS.docs.map(d => ({ id: d.id, ...d.data() }))
+        };
 
-    return () => {
-      unsubGen();
-      unsubProf();
-      unsubProjects();
-      unsubSkills();
-      unsubServices();
-      unsubTestimonials();
+        setGeneral(newData.general);
+        setProfile(newData.profile);
+        setProjects(newData.projects);
+        setSkills(newData.skills);
+        setServices(newData.services);
+        setTestimonials(newData.testimonials);
+        
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, timestamp: now }));
+      } catch (err) {
+        console.warn("Firestore fetch error, using cache/fallback:", err);
+      }
     };
-  }, []);
+
+    // Si es Admin, mantenemos el tiempo real para una mejor UX al editar
+    if (isAdmin) {
+      const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => snap.exists() && setGeneral(snap.data()));
+      const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() && setProfile(snap.data()));
+      const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      
+      return () => {
+        unsubGen(); unsubProf(); unsubProjects(); unsubSkills();
+      };
+    } else {
+      loadData();
+    }
+  }, [isAdmin]);
 
   const hasCheckedInit = useRef(false);
 
@@ -345,6 +291,7 @@ function AppContent() {
                   <LogIn size={14} /> Acceso
                 </button>
               )}
+              
             </div>
 
             <button className="md:hidden text-[#00f2ff]" onClick={() => setOpen(!open)} aria-label="Abrir menú">
@@ -372,11 +319,6 @@ function AppContent() {
                   {l}
                 </a>
               ))}
-              <div className="flex gap-8 mt-12 pt-12 border-t border-white/10 w-full justify-center">
-                {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#00f2ff]"><Github size={24} /></a>}
-                {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#00f2ff]"><Linkedin size={24} /></a>}
-                {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#00f2ff]"><Instagram size={24} /></a>}
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -535,7 +477,7 @@ function AppContent() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1px bg-white/10">
             <AnimatePresence mode="popLayout">
               {filtered.map(p => (
-                <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-8 border border-white/5">
+                <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-8 border border-white/10 hover:border-[#00f2ff]/30 transition-all duration-500">
                   <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
                   
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-700" />
@@ -857,7 +799,7 @@ function AppContent() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-px bg-gradient-to-r from-transparent via-[#00f2ff]/50 to-transparent" />
         
         <div className="flex flex-col items-center gap-4">
-          <div className="font-mono text-[10px] text-gray-500 tracking-[0.5em] uppercase text-center">Protocolo de Identidad // 2026 Burgos Studio ✨</div>
+          <div className="font-mono text-[10px] text-gray-500 tracking-[0.5em] uppercase text-center">Protocolo de Identidad // {new Date().getFullYear()} Burgos Diseño ✨</div>
           <div className="flex items-center gap-6">
             <div className="font-mono text-[11px] text-[#00f2ff] tracking-widest uppercase flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#00f2ff] animate-pulse" /> +34 613 476 029
@@ -882,11 +824,11 @@ function AppContent() {
       </footer>
 
       {/* Floating Social Sidebar */}
-      <div className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-[150] hidden lg:flex flex-col gap-6 p-4 bg-black/40 hover:bg-black/80 backdrop-blur-3xl border border-[#00f2ff]/10 hover:border-[#00f2ff]/30 shadow-2xl rounded-full transition-all duration-500 opacity-30 hover:opacity-100 group">
-        {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-150 active:scale-90" aria-label="Github"><Github size={18} /></a>}
-        {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-150 active:scale-90" aria-label="LinkedIn"><Linkedin size={18} /></a>}
-        {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-150 active:scale-90" aria-label="Instagram"><Instagram size={18} /></a>}
-        {general.socialYoutube && <a href={ensureAbsoluteUrl(general.socialYoutube)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#ff0000] transition-all hover:scale-150 active:scale-90" aria-label="YouTube"><Youtube size={18} /></a>}
+      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[150] flex flex-col gap-5 p-3 bg-black/60 backdrop-blur-xl border border-[#00f2ff]/20 rounded-full transition-all duration-500 hover:border-[#00f2ff] hover:shadow-[0_0_20px_rgba(0,242,255,0.2)] group">
+        {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-125" aria-label="Github"><Github size={18} /></a>}
+        {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-125" aria-label="LinkedIn"><Linkedin size={18} /></a>}
+        {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#00f2ff] transition-all hover:scale-125" aria-label="Instagram"><Instagram size={18} /></a>}
+        {general.socialYoutube && <a href={ensureAbsoluteUrl(general.socialYoutube)} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-[#ff0000] transition-all hover:scale-125" aria-label="YouTube"><Youtube size={18} /></a>}
       </div>
 
       {/* Floating WhatsApp Button */}

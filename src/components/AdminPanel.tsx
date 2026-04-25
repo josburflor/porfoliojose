@@ -84,7 +84,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: 'project' | 'hero' | 'profile') => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 800000) { alert('Máximo 800KB.'); return; }
+      if (file.size > 500000) { 
+        alert('OPTIMIZACIÓN REQUERIDA: La imagen pesa ' + (file.size/1024).toFixed(0) + 'KB. El máximo permitido es 500KB para mantener la web rápida.'); 
+        return; 
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         const res = reader.result as string;
@@ -384,24 +387,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                 <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Personalización Hero</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 1</label>
-                    <input type="text" placeholder="Título 1" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 1 (Principal)</label>
+                    <input type="text" placeholder="Ej: ARQUITECTO" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 2</label>
-                    <input type="text" placeholder="Título 2" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 2 (Destacado)</label>
+                    <input type="text" placeholder="Ej: DIGITAL" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
                   </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Video URL (YouTube/Vimeo)</label>
-                    <input type="text" value={genData.heroVideoUrl} onChange={e => setGenData({...genData, heroVideoUrl: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Subtítulo Hero (Mensaje de Bienvenida)</label>
+                    <textarea value={genData.heroSubtitle} onChange={e => setGenData({...genData, heroSubtitle: e.target.value})} rows={3} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white resize-none outline-none focus:border-[#00f2ff]" placeholder="Describe tu propuesta de valor..." />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Fondo Alternativo (Subir)</label>
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Video ID o URL (Vimeo/YouTube)</label>
+                    <input type="text" placeholder="Ej: 1185319571" value={genData.heroVideoUrl} onChange={e => setGenData({...genData, heroVideoUrl: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Fondo Alternativo (Imagen)</label>
                     <div className="flex gap-4 items-center bg-black/30 p-4 border border-white/5">
-                      {genData.heroBgImg && <img src={genData.heroBgImg} className="w-12 h-12 object-cover border border-white/10" />}
-                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} className="text-[9px]" />
+                      {genData.heroBgImg && <img src={genData.heroBgImg} className="w-12 h-12 object-cover border border-[#00f2ff]/30" />}
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} className="text-[9px] text-gray-500 file:bg-[#00f2ff]/10 file:text-[#00f2ff] file:border-0 file:px-3 file:py-1 file:cursor-pointer" />
                     </div>
                   </div>
                 </div>
@@ -409,23 +414,50 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
 
               {/* SOCIAL & IDENTITY */}
               <div className="bg-white/5 border border-white/10 p-8 space-y-8">
-                <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Identidad y Redes Sociales</h3>
+                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                  <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest">Identidad y Redes Sociales</h3>
+                  <span className="text-[8px] text-white/20 font-mono">Los links se actualizan en tiempo real en Footer y Sidebar</span>
+                </div>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">GitHub URL</label>
-                    <input type="text" value={genData.socialGithub} onChange={e => setGenData({...genData, socialGithub: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">LinkedIn Profile URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="www.linkedin.com/in/usuario" 
+                      value={genData.socialLinkedin} 
+                      onChange={e => setGenData({...genData, socialLinkedin: e.target.value})} 
+                      className="w-full bg-black/50 border border-white/10 p-4 text-xs text-[#00f2ff] outline-none focus:border-[#00f2ff]" 
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">LinkedIn URL</label>
-                    <input type="text" value={genData.socialLinkedin} onChange={e => setGenData({...genData, socialLinkedin: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">GitHub Profile URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="github.com/usuario" 
+                      value={genData.socialGithub} 
+                      onChange={e => setGenData({...genData, socialGithub: e.target.value})} 
+                      className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" 
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Instagram URL</label>
-                    <input type="text" value={genData.socialInstagram} onChange={e => setGenData({...genData, socialInstagram: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">Instagram Profile URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="instagram.com/usuario" 
+                      value={genData.socialInstagram} 
+                      onChange={e => setGenData({...genData, socialInstagram: e.target.value})} 
+                      className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" 
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">YouTube URL</label>
-                    <input type="text" value={genData.socialYoutube} onChange={e => setGenData({...genData, socialYoutube: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white" />
+                    <label className="text-[8px] font-mono text-gray-500 uppercase">YouTube Channel URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="youtube.com/@canal" 
+                      value={genData.socialYoutube} 
+                      onChange={e => setGenData({...genData, socialYoutube: e.target.value})} 
+                      className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" 
+                    />
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
