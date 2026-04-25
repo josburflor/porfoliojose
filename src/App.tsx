@@ -68,12 +68,15 @@ function AppContent() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [resetSent, setResetSent] = useState(false);
+  const [contactSent, setContactSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   // Dynamic Data States with Fallback
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
   const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
   const [services, setServices] = useState<any[]>([]); // Se cargará dinámicamente
   const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
+  const [messages, setMessages] = useState<any[]>([]);
   const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
   const [profile, setProfile] = useState(BACKUP_PROFILE);
 
@@ -169,9 +172,10 @@ function AppContent() {
       const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() && setProfile(snap.data()));
       const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubMessages = onSnapshot(query(collection(db, 'messages'), orderBy('date', 'desc')), (s) => setMessages(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       
       return () => {
-        unsubGen(); unsubProf(); unsubProjects(); unsubSkills();
+        unsubGen(); unsubProf(); unsubProjects(); unsubSkills(); unsubMessages();
       };
     } else {
       loadData();
@@ -674,33 +678,69 @@ function AppContent() {
             <div className="w-12 h-1 bg-[#00f2ff]" />
             <h2 className="text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">ESTABLECER CONTACTO</h2>
           </div>
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.target as any;
-              const name = form.elements[0].value;
-              const email = form.elements[1].value;
-              const message = form.elements[2].value;
-              window.location.href = `mailto:josburflor@gmail.com?subject=Solicitud de Contacto: ${name}&body=Nombre: ${name}%0D%0AEmail: ${email}%0D%0AMensaje: ${message}`;
-            }} 
-            className="grid sm:grid-cols-2 gap-6 text-left"
-          >
-            <div className="space-y-2">
-              <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Nombre</label>
-              <input type="text" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Escribe tu nombre..." />
-            </div>
-            <div className="space-y-2">
-              <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Email</label>
-              <input type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
-            </div>
-            <div className="sm:col-span-2 space-y-2">
-              <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Solicitud</label>
-              <textarea required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="¿En qué puedo ayudarte?" />
-            </div>
-            <button className="sm:col-span-2 cyber-button w-full h-14 flex items-center justify-center gap-4 text-[18px] font-bold">
-              Transmitir_Datos <Send size={16} />
-            </button>
-          </form>
+          {contactSent ? (
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              className="bg-[#00f2ff]/5 border border-[#00f2ff]/30 p-12 text-center space-y-6 backdrop-blur-xl"
+            >
+              <div className="w-20 h-20 bg-[#00f2ff] rounded-full flex items-center justify-center text-black mx-auto shadow-[0_0_30px_rgba(0,242,255,0.4)]">
+                <CheckCircle2 size={40} />
+              </div>
+              <h3 className="text-2xl font-bold font-mono text-[#00f2ff] uppercase tracking-widest">Transmisión Exitosa</h3>
+              <p className="text-white/60 font-mono text-sm uppercase tracking-wider">Tu mensaje ha sido cifrado y enviado al sistema central. <br/> Recibirás una respuesta pronto.</p>
+              <button 
+                onClick={() => setContactSent(false)} 
+                className="text-[#00f2ff] font-mono text-[10px] uppercase border-b border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all pt-4"
+              >
+                Enviar otro mensaje
+              </button>
+            </motion.div>
+          ) : (
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsSending(true);
+                const form = e.target as any;
+                const name = form.elements[0].value;
+                const email = form.elements[1].value;
+                const message = form.elements[2].value;
+
+                try {
+                  await addDoc(collection(db, 'messages'), {
+                    name,
+                    email,
+                    message,
+                    date: new Date().toISOString(),
+                    status: 'unread'
+                  });
+                  setContactSent(true);
+                  form.reset();
+                } catch (err) {
+                  alert('Error en la transmisión de datos. Por favor, intenta de nuevo.');
+                } finally {
+                  setIsSending(false);
+                }
+              }} 
+              className="grid sm:grid-cols-2 gap-6 text-left"
+            >
+              <div className="space-y-2">
+                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Nombre</label>
+                <input type="text" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Escribe tu nombre..." />
+              </div>
+              <div className="space-y-2">
+                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Email</label>
+                <input type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
+              </div>
+              <div className="sm:col-span-2 space-y-2">
+                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Solicitud</label>
+                <textarea required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="¿En qué puedo ayudarte?" />
+              </div>
+              <button disabled={isSending} className="sm:col-span-2 cyber-button w-full h-14 flex items-center justify-center gap-4 text-[18px] font-bold">
+                {isSending ? 'Transmitiendo...' : 'Transmitir_Datos'} <Send size={16} />
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
@@ -710,6 +750,7 @@ function AppContent() {
         skills={skills} 
         services={services}
         testimonials={testimonials}
+        messages={messages}
         initialGeneral={general} 
         initialProfile={profile} 
         onClose={() => setShowAdmin(false)} 

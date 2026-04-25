@@ -12,13 +12,14 @@ interface AdminPanelProps {
   skills: any[];
   services: any[];
   testimonials: any[];
+  messages: any[];
   initialGeneral: any;
   initialProfile: any;
 }
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skills, services, testimonials, initialGeneral, initialProfile }) => {
+export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skills, services, testimonials, messages, initialGeneral, initialProfile }) => {
   const { logout, isAdmin, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'proyectos' | 'habilidades' | 'servicios' | 'testimonios' | 'contenido' | 'configuracion' | 'seguridad'>('proyectos');
+  const [activeTab, setActiveTab] = useState<'proyectos' | 'habilidades' | 'servicios' | 'testimonios' | 'mensajes' | 'contenido' | 'configuracion' | 'seguridad'>('proyectos');
 
   // Security & Global States
   const [newEmail, setNewEmail] = useState('');
@@ -103,7 +104,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
     { id: 'proyectos', label: 'Proyectos', icon: <Globe size={14} /> },
     { id: 'habilidades', label: 'Habilidades', icon: <Settings size={14} /> },
     { id: 'servicios', label: 'Servicios', icon: <CreditCard size={14} /> },
-    { id: 'testimonios', label: 'Testimonios', icon: <MessageSquare size={14} /> },
+    { id: 'testimonios', label: 'Testimonios', icon: <Star size={14} /> },
+    { id: 'mensajes', label: 'Mensajes', icon: <MessageSquare size={14} /> },
     { id: 'contenido', label: 'Contenido', icon: <User size={14} /> },
     { id: 'configuracion', label: 'Configuración', icon: <Settings size={14} /> },
     { id: 'seguridad', label: 'Seguridad', icon: <Shield size={14} /> },
@@ -373,6 +375,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     <button onClick={() => handleDelete('testimonials', t.id)} className="p-4 text-white/10 group-hover:text-red-500 transition-colors ml-4" title="Eliminar Comentario">
                       <Trash2 size={18} />
                     </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* MENSAJES DE CONTACTO */}
+          {activeTab === 'mensajes' && (
+            <div className="space-y-6">
+              <h3 className="font-mono text-[10px] text-white/50 uppercase tracking-[0.3em] mb-8">Bandeja de Entrada ({messages.length})</h3>
+              <div className="grid gap-4">
+                {messages.length === 0 ? (
+                  <div className="text-center py-20 border border-dashed border-white/10 font-mono text-[10px] text-white/20 uppercase">No hay mensajes entrantes</div>
+                ) : messages.map(m => (
+                  <div key={m.id} className="bg-white/5 border border-white/10 p-6 flex flex-col gap-4 group hover:border-[#00f2ff]/30 transition-all">
+                    <div className="flex justify-between items-start">
+                      <div className="flex gap-4 items-center">
+                        <div className="w-10 h-10 bg-[#00f2ff] flex items-center justify-center text-black font-bold text-xs">
+                          {m.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-[11px] uppercase tracking-widest text-white">{m.name}</p>
+                          <p className="text-[10px] font-mono text-[#00f2ff]">{m.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[9px] font-mono text-white/20 uppercase">
+                          {new Date(m.date).toLocaleString()}
+                        </span>
+                        <button onClick={() => handleDelete('messages', m.id)} className="text-white/20 hover:text-red-500 transition-colors">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-black/40 p-4 border border-white/5">
+                      <p className="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">{m.message}</p>
+                    </div>
                   </div>
                 ))}
               </div>
