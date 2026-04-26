@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
-import { doc, updateDoc, setDoc, collection, addDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, collection, addDoc, deleteDoc, arrayUnion } from '../localDb';
 import { updateEmail, updatePassword } from 'firebase/auth';
 import { X, Plus, Save, Trash2, LogOut, Shield, Key, Edit2, Globe, FileText, Settings, User, CreditCard, MessageSquare, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -604,28 +604,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                 </button>
               </div>
               
-              <div className="pt-6 border-t border-white/10 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[8px] font-mono text-gray-500 uppercase">Nueva Clave de Acceso</label>
-                  <input type="password" placeholder="Mínimo 6 caracteres" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
-                </div>
-                <button 
-                  onClick={async () => {
-                    if (!newPassword) return;
-                    setSecMsg({type:'info', text:'Procesando cambio de clave...'});
-                    try { 
-                      await updatePassword(user!, newPassword); 
-                      setSecMsg({type:'success', text:'Clave de acceso actualizada.'}); 
-                    } catch (e: any) { 
-                      const msg = e.code === 'auth/requires-recent-login' ? 'Error: Debes re-autenticarte (Log Out/Log In) para cambiar la contraseña.' : e.message;
-                      setSecMsg({type:'error', text: msg}); 
-                    }
-                  }} 
-                  className="w-full border border-[#00f2ff]/30 py-3 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/10 transition-all"
-                >
-                  Actualizar Clave Maestra
-                </button>
               </div>
+
+              <div className="pt-6 border-t border-white/10 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-[10px] font-mono text-white uppercase tracking-widest">Base de Datos Local (Offline)</h4>
+                    <p className="text-[8px] text-white/40 uppercase mt-1">Si se activa, la web funcionará 100% local sin usar la nube.</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const isLocal = localStorage.getItem('DEV_LOCAL_MODE') === 'true';
+                      localStorage.setItem('DEV_LOCAL_MODE', (!isLocal).toString());
+                      window.location.reload();
+                    }}
+                    className={`px-4 py-2 text-[10px] font-mono uppercase border transition-all ${
+                      localStorage.getItem('DEV_LOCAL_MODE') === 'true' 
+                        ? 'bg-green-500/20 border-green-500 text-green-400' 
+                        : 'border-white/20 text-white/40 hover:border-[#00f2ff] hover:text-[#00f2ff]'
+                    }`}
+                  >
+                    {localStorage.getItem('DEV_LOCAL_MODE') === 'true' ? 'Activado: MODO LOCAL' : 'Desactivado: MODO CLOUD'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/10 space-y-4">
               {secMsg.text && (
                 <div className={`p-4 text-[9px] uppercase border animate-pulse ${
                   secMsg.type === 'success' ? 'border-green-500/30 text-green-400 bg-green-500/5' : 
