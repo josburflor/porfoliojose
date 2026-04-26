@@ -718,15 +718,15 @@ function AppContent() {
               onSubmit={async (e) => {
                 e.preventDefault();
                 setIsSending(true);
-                const form = e.target as any;
-                const name = form.elements[0].value;
-                const email = form.elements[1].value;
-                const phone = form.elements[2].value;
-                const message = form.elements[3].value;
+                const formData = new FormData(form);
+                const name = formData.get('nombre') as string;
+                const email = formData.get('correo') as string;
+                const phone = formData.get('telefono') as string;
+                const message = formData.get('mensaje') as string;
 
                 try {
-                  // 1. Guardar en Firestore para el Panel Admin
-                  await addDoc(collection(db, 'messages'), {
+                  // 1. Guardar en Firestore (Prioritario para el Panel Admin)
+                  const docRef = await addDoc(collection(db, 'messages'), {
                     name,
                     email,
                     phone,
@@ -735,28 +735,21 @@ function AppContent() {
                     status: 'unread'
                   });
 
-                  // 2. Envío Automático al Correo (Sin abrir agentes externos)
-                  // Usamos Formspree como puente profesional para envío directo al correo
-                  await fetch('https://formspree.io/f/mqakayzy', { // ID temporal o del usuario
+                  console.log("Mensaje guardado en Firebase con ID:", docRef.id);
+
+                  // 2. Envío Automático al Correo (Formspree)
+                  fetch('https://formspree.io/f/mqakayzy', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                      nombre: name, 
-                      correo: email, 
-                      telefono: phone, 
-                      mensaje: message,
-                      _subject: `Nuevo mensaje de ${name} desde Burgos Diseño`
-                    })
-                  }).catch(() => {
-                    // Si falla el fetch externo (bloqueo, etc), al menos ya guardamos en Firestore
-                    console.warn("Fallo el envío automático al correo, pero se guardó en el panel.");
-                  });
+                    body: JSON.stringify({ nombre: name, correo: email, telefono: phone, mensaje: message })
+                  }).catch(e => console.warn("Fallo notificación externa:", e));
 
+                  // 3. Feedback inmediato
                   setContactSent(true);
                   form.reset();
                 } catch (err) {
-                  console.error("Error en transmisión:", err);
-                  alert('Error en la transmisión de datos. Por favor, intenta de nuevo.');
+                  console.error("Error crítico de base de datos:", err);
+                  alert('Error al transmitir datos a la base de datos. Por favor, revisa tu conexión.');
                 } finally {
                   setIsSending(false);
                 }
@@ -765,19 +758,19 @@ function AppContent() {
             >
               <div className="space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Nombre</label>
-                <input type="text" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Escribe tu nombre..." />
+                <input name="nombre" type="text" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Escribe tu nombre..." />
               </div>
               <div className="space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Email</label>
-                <input type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
+                <input name="correo" type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
               </div>
               <div className="sm:col-span-2 space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Número de Teléfono (con código de área)</label>
-                <input type="tel" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Ej: +34 600 000 000" />
+                <input name="telefono" type="tel" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Ej: +34 600 000 000" />
               </div>
               <div className="sm:col-span-2 space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Solicitud</label>
-                <textarea required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="¿En qué puedo ayudarte?" />
+                <textarea name="mensaje" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="¿En qué puedo ayudarte?" />
               </div>
               <button disabled={isSending} className="sm:col-span-2 cyber-button w-full h-14 flex items-center justify-center gap-4 text-[18px] font-bold">
                 {isSending ? 'Transmitiendo...' : 'Transmitir_Datos'} <Send size={16} />
