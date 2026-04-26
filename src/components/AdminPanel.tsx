@@ -399,6 +399,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                         <div>
                           <p className="font-bold text-[11px] uppercase tracking-widest text-white">{m.name}</p>
                           <p className="text-[10px] font-mono text-[#00f2ff]">{m.email}</p>
+                          {m.phone && <p className="text-[9px] font-mono text-white/40">{m.phone}</p>}
                         </div>
                       </div>
                       <div className="flex items-center gap-4">

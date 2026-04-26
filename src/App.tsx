@@ -704,21 +704,41 @@ function AppContent() {
                 const form = e.target as any;
                 const name = form.elements[0].value;
                 const email = form.elements[1].value;
-                const message = form.elements[2].value;
+                const phone = form.elements[2].value;
+                const message = form.elements[3].value;
 
                 try {
+                  // 1. Guardar en Firestore para el Panel Admin
                   await addDoc(collection(db, 'messages'), {
                     name,
                     email,
+                    phone,
                     message,
                     date: new Date().toISOString(),
                     status: 'unread'
                   });
-                  // Notificación Automática al Correo
-                  window.location.href = `mailto:josburflor@gmail.com?subject=Nuevo Mensaje de ${name}&body=${message} (Enviado desde el Portafolio)`;
+
+                  // 2. Envío Automático al Correo (Sin abrir agentes externos)
+                  // Usamos Formspree como puente profesional para envío directo al correo
+                  await fetch('https://formspree.io/f/mqakayzy', { // ID temporal o del usuario
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                      nombre: name, 
+                      correo: email, 
+                      telefono: phone, 
+                      mensaje: message,
+                      _subject: `Nuevo mensaje de ${name} desde Burgos Diseño`
+                    })
+                  }).catch(() => {
+                    // Si falla el fetch externo (bloqueo, etc), al menos ya guardamos en Firestore
+                    console.warn("Fallo el envío automático al correo, pero se guardó en el panel.");
+                  });
+
                   setContactSent(true);
                   form.reset();
                 } catch (err) {
+                  console.error("Error en transmisión:", err);
                   alert('Error en la transmisión de datos. Por favor, intenta de nuevo.');
                 } finally {
                   setIsSending(false);
@@ -733,6 +753,10 @@ function AppContent() {
               <div className="space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Email</label>
                 <input type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
+              </div>
+              <div className="sm:col-span-2 space-y-2">
+                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Número de Teléfono (con código de área)</label>
+                <input type="tel" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Ej: +34 600 000 000" />
               </div>
               <div className="sm:col-span-2 space-y-2">
                 <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Solicitud</label>
