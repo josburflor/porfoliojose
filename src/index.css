@@ -33,7 +33,14 @@ body {
   @apply bg-white/5 backdrop-blur-xl border border-white/10;
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { @apply bg-black; }
-::-webkit-scrollbar-thumb { @apply bg-[#00f2ff]/20 rounded-full hover:bg-[#00f2ff]/40; }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-white/5;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-[#00f2ff]/30 rounded-full hover:bg-[#00f2ff]/60 transition-colors;
+}
 

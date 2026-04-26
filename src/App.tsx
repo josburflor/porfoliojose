@@ -495,7 +495,7 @@ function AppContent() {
               ))}
             </div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1px bg-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 max-h-[1400px] overflow-y-auto custom-scrollbar scroll-smooth">
             <AnimatePresence mode="popLayout">
               {filtered.map(p => (
                 <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-8 border border-white/10 hover:border-[#00f2ff]/30 transition-all duration-500">
