@@ -48,7 +48,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
     try {
       await setDoc(doc(db, 'config', 'general'), genData, { merge: true });
       await setDoc(doc(db, 'config', 'profile'), profData, { merge: true });
-      setContMsg({ type: 'success', text: 'Configuración guardada.' });
+      setContMsg({ type: 'success', text: 'ACTUALIZADO' });
     } catch (err: any) {
       setContMsg({ type: 'error', text: err.message });
     } finally { setIsSaving(false); }
@@ -61,6 +61,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
       if (id) await updateDoc(doc(db, 'projects', id), data);
       else await addDoc(collection(db, 'projects'), { ...data, order: projects.length });
       setEditingProject(null);
+      setContMsg({ type: 'success', text: 'ACTUALIZADO' });
     } catch (err: any) { setContMsg({ type: 'error', text: err.message }); }
     finally { setIsSaving(false); }
   };
@@ -170,7 +171,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     <div className="space-y-2">
                       <label className="text-[9px] font-mono uppercase text-gray-500 tracking-widest">Categoría del Nodo</label>
                       <select value={editingProject.cat} onChange={e => setEditingProject({...editingProject, cat: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]">
-                        {['App', 'Diseño Web', 'Wordpress', 'Figma', 'Diseño UX/UI', 'Prestashop'].map(c => <option key={c} value={c}>{c}</option>)}
+                        {['App', 'Diseño Web', 'Wordpress', 'Figma', 'Animaciones', 'Prestashop'].map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
                     </div>
                   </div>

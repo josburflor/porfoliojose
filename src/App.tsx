@@ -244,7 +244,7 @@ function AppContent() {
     }
   }, [isAdmin]);
 
-  const categories = ['Todos', 'App', 'Diseño Web', 'Wordpress', 'Figma', 'Diseño UX/UI', 'Prestashop'];
+  const categories = ['Todos', 'App', 'Diseño Web', 'Wordpress', 'Figma', 'Animaciones', 'Prestashop'];
   
   const visibleSkills = useMemo(() => {
     return skills.filter(s => !general.hiddenIds?.includes(s.id));
@@ -714,6 +714,8 @@ function AppContent() {
                     date: new Date().toISOString(),
                     status: 'unread'
                   });
+                  // Notificación Automática al Correo
+                  window.location.href = `mailto:josburflor@gmail.com?subject=Nuevo Mensaje de ${name}&body=${message} (Enviado desde el Portafolio)`;
                   setContactSent(true);
                   form.reset();
                 } catch (err) {

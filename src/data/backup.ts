@@ -48,7 +48,7 @@ export const BACKUP_PROJECTS = [
   { 
     id: 'init-p3', 
     title: 'DASHBOARD ANALYTICS', 
-    cat: 'Diseño UX/UI', 
+    cat: 'Animaciones', 
     tech: ['React', 'D3.js', 'Figma'], 
     img: 'https://images.unsplash.com/photo-1581291518062-c067756f642a?auto=format&fit=crop&q=80&w=800',
     description: 'Visualización de datos complejos para la toma de decisiones estratégicas en tiempo real.',
