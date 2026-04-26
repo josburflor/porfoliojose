@@ -56,7 +56,7 @@ export default function App() {
 }
 
 function AppContent() {
-  const { user, isAdmin, login, resetPassword } = useAuth();
+  const { user, isAdmin, login, resetPassword, logout } = useAuth();
   const [cat, setCat] = useState('Todos');
   const [open, setOpen] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
@@ -718,7 +718,8 @@ function AppContent() {
               onSubmit={async (e) => {
                 e.preventDefault();
                 setIsSending(true);
-                const formData = new FormData(form);
+                const currentForm = e.currentTarget;
+                const formData = new FormData(currentForm);
                 const name = formData.get('nombre') as string;
                 const email = formData.get('correo') as string;
                 const phone = formData.get('telefono') as string;
@@ -746,7 +747,7 @@ function AppContent() {
 
                   // 3. Feedback inmediato
                   setContactSent(true);
-                  form.reset();
+                  currentForm.reset();
                 } catch (err) {
                   console.error("Error crítico de base de datos:", err);
                   alert('Error al transmitir datos a la base de datos. Por favor, revisa tu conexión.');
