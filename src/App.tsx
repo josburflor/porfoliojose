@@ -166,7 +166,6 @@ function AppContent() {
       }
     };
 
-    // Si es Admin, mantenemos el tiempo real para una mejor UX al editar
     if (isAdmin) {
       const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => snap.exists() && setGeneral(snap.data()));
       const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() && setProfile(snap.data()));
@@ -179,6 +178,24 @@ function AppContent() {
       };
     } else {
       loadData();
+    }
+  }, [isAdmin]);
+
+  // Migración automática de categorías (Ingeniería de Consistencia)
+  useEffect(() => {
+    if (isAdmin) {
+      const migrate = async () => {
+        try {
+          const snap = await getDocs(collection(db, 'projects'));
+          snap.docs.forEach(async (d) => {
+            if (d.data().cat === 'Diseño UX/UI') {
+              await updateDoc(doc(db, 'projects', d.id), { cat: 'Animaciones' });
+              console.log(`Migrado nodo ${d.id} a Animaciones`);
+            }
+          });
+        } catch (e) { console.error("Migration error:", e); }
+      };
+      migrate();
     }
   }, [isAdmin]);
 
