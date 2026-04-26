@@ -603,8 +603,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   Actualizar Protocolo de Email
                 </button>
               </div>
-              
-              </div>
 
               <div className="pt-6 border-t border-white/10 space-y-4">
                 <div className="flex justify-between items-center">
@@ -629,7 +627,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/10 space-y-4">
               {secMsg.text && (
                 <div className={`p-4 text-[9px] uppercase border animate-pulse ${
                   secMsg.type === 'success' ? 'border-green-500/30 text-green-400 bg-green-500/5' : 
