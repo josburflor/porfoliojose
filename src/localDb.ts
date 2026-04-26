@@ -66,6 +66,7 @@ export const addDoc = async (coll: any, data: any) => {
   docs.push(newDoc);
   localStore.set(coll.path, docs);
   window.dispatchEvent(new Event(`local_db_change_${coll.path}`));
+  triggerSync().catch(() => {}); // Auto-detection
   return newDoc;
 };
 
@@ -77,6 +78,7 @@ export const updateDoc = async (docRef: any, data: any) => {
     docs[idx] = { ...docs[idx], ...data };
     localStore.set(docRef.path, docs);
     window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+    triggerSync().catch(() => {}); // Auto-detection
   }
 };
 
@@ -88,6 +90,7 @@ export const setDoc = async (docRef: any, data: any) => {
   else docs.push({ ...data, id: docRef.id });
   localStore.set(docRef.path, docs);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+  triggerSync().catch(() => {}); // Auto-detection
 };
 
 export const getDoc = async (docRef: any) => {
@@ -130,4 +133,28 @@ export const onSnapshot = (ref: any, callback: (snap: any) => void) => {
   window.addEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
   handler(); 
   return () => window.removeEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
+};
+
+// --- SYNC ENGINE ---
+export const triggerSync = async () => {
+  const allData: Record<string, any> = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith('local_db_')) {
+      try {
+        allData[key] = JSON.parse(localStorage.getItem(key) || '[]');
+      } catch (e) {}
+    }
+  }
+
+  try {
+    const response = await fetch('http://localhost:3005/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allData)
+    });
+    return await response.json();
+  } catch (err) {
+    throw new Error('El servidor de sincronización no está corriendo en http://localhost:3005');
+  }
 };

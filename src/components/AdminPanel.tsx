@@ -625,6 +625,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     {localStorage.getItem('DEV_LOCAL_MODE') === 'true' ? 'Activado: MODO LOCAL' : 'Desactivado: MODO CLOUD'}
                   </button>
                 </div>
+                
+                {localStorage.getItem('DEV_LOCAL_MODE') === 'true' && (
+                  <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded space-y-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[8px] text-orange-300 uppercase">Sincronización Git para Cambios Locales</p>
+                      <span className="text-[7px] text-white/30 uppercase">Port: 3005</span>
+                    </div>
+                    <button 
+                      onClick={async () => {
+                        setSecMsg({type:'info', text:'Enviando snapshot a Git...'});
+                        try {
+                          const { triggerSync } = await import('../localDb');
+                          const result = await triggerSync();
+                          if (result.status === 'committed') {
+                            setSecMsg({type:'success', text:'Snapshot guardado y Commit realizado con éxito.'});
+                          } else if (result.status === 'no_changes') {
+                            setSecMsg({type:'info', text:'No hay cambios nuevos para guardar.'});
+                          }
+                        } catch (err: any) {
+                          setSecMsg({type:'error', text: err.message});
+                        }
+                      }}
+                      className="w-full py-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 text-[9px] font-mono uppercase hover:bg-orange-500/20 transition-all"
+                    >
+                      Realizar Commit de Cambios Locales
+                    </button>
+                  </div>
+                )}
               </div>
 
               {secMsg.text && (
