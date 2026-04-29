@@ -545,9 +545,9 @@ function AppContent() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-5xl font-black mb-4 uppercase tracking-tighter">
-              Servicios <span className="text-[#00f2ff]">Premium</span>
+              Servicios <span className="text-[#00f2ff]">a tu medida</span>
             </h2>
-            <p className="text-white/40 font-mono text-sm uppercase tracking-[0.3em]">Soluciones a medida para proyectos ambiciosos</p>
+            <p className="text-white/40 font-mono text-sm uppercase tracking-[0.3em]">Soluciones adaptadas para proyectos ambiciosos</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -767,9 +767,9 @@ function AppContent() {
                   // 2. Feedback inmediato
                   setContactSent(true);
                   currentForm.reset();
-                } catch (err) {
+                } catch (err: any) {
                   console.error("Error crítico de base de datos:", err);
-                  alert('Error al transmitir datos a la base de datos. Por favor, revisa tu conexión.');
+                  alert('Error al transmitir datos a la base de datos: ' + err.message + '\n\nPor favor, revisa tu conexión o avísame de este error exacto.');
                 } finally {
                   setIsSending(false);
                 }
