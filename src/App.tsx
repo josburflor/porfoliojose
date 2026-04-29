@@ -499,7 +499,7 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="proyectos" className="py-20 md:py-32 px-8">
+      <section id="proyectos" className="py-20 md:py-32 px-8 bg-black/40 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16 gap-8">
             <div className="space-y-8">
