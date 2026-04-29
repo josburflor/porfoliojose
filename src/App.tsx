@@ -71,6 +71,26 @@ function AppContent() {
   const [contactSent, setContactSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
+  // Scroll variables
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isHoveringScroll, setIsHoveringScroll] = useState(false);
+
+  useEffect(() => {
+    let animationId: number;
+    const scroll = () => {
+      if (scrollRef.current && !isHoveringScroll) {
+        scrollRef.current.scrollLeft += 1;
+        // Reiniciar cuando llegue al final para dar efecto infinito
+        if (scrollRef.current.scrollLeft >= scrollRef.current.scrollWidth - scrollRef.current.clientWidth - 1) {
+          scrollRef.current.scrollLeft = 0;
+        }
+      }
+      animationId = requestAnimationFrame(scroll);
+    };
+    animationId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationId);
+  }, [isHoveringScroll]);
+
   // Dynamic Data States with Fallback
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
   const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
@@ -444,39 +464,38 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="conocimientos" className="py-20 md:py-32 px-8 bg-black/40 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-12 md:mb-20 space-y-6 md:space-y-8">
-            <div className="w-12 h-1 bg-[#00f2ff]" />
-            <h2 className="text-3xl md:text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">CONOCIMIENTOS</h2>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visibleSkills.map((s, idx) => (
-              <motion.div 
-                key={idx}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className="glass-panel p-6 border-l-4 border-l-[#00f2ff] hover:bg-[#00f2ff]/10 hover:shadow-[0_0_30px_rgba(0,242,255,0.15)] transition-all relative overflow-hidden group cursor-default"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00f2ff]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="flex items-center justify-between mb-4 relative z-10">
-                  <div className="text-[#00f2ff] group-hover:scale-110 transition-transform duration-300">
-                    {IconMap[s.icon as string] || <Code2 size={18} />}
-                  </div>
-                  <span className="font-mono text-[12px] text-[#00f2ff] opacity-70 bg-[#00f2ff]/10 px-2 py-0.5 rounded backdrop-blur-sm">{s.level}%</span>
+      <section id="conocimientos" className="py-12 md:py-20 w-full overflow-hidden relative group">
+        <div 
+          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 custom-scrollbar scroll-smooth"
+          ref={scrollRef}
+          onMouseEnter={() => setIsHoveringScroll(true)}
+          onMouseLeave={() => setIsHoveringScroll(false)}
+        >
+          {[...visibleSkills, ...visibleSkills, ...visibleSkills, ...visibleSkills].map((s, idx) => (
+            <motion.div 
+              key={idx}
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="min-w-[280px] md:min-w-[320px] glass-panel p-6 border-l-4 border-l-[#00f2ff] hover:bg-[#00f2ff]/10 hover:shadow-[0_0_30px_rgba(0,242,255,0.15)] transition-all relative overflow-hidden flex-shrink-0 cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#00f2ff]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+              
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="text-[#00f2ff] hover:scale-110 transition-transform duration-300">
+                  {IconMap[s.icon as string] || <Code2 size={18} />}
                 </div>
-                <h3 className="font-mono text-[18px] font-bold uppercase tracking-widest text-white group-hover:text-[#00f2ff] transition-colors relative z-10">{s.name}</h3>
-                <div className="w-full h-[1px] bg-white/5 mt-4 relative z-10">
-                  <motion.div 
-                    initial={{ width: 0 }} 
-                    whileInView={{ width: `${s.level}%` }} 
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" 
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                <span className="font-mono text-[12px] text-[#00f2ff] opacity-70 bg-[#00f2ff]/10 px-2 py-0.5 rounded backdrop-blur-sm">{s.level}%</span>
+              </div>
+              <h3 className="font-mono text-[18px] font-bold uppercase tracking-widest text-white transition-colors relative z-10 line-clamp-1">{s.name}</h3>
+              <div className="w-full h-[1px] bg-white/5 mt-4 relative z-10">
+                <motion.div 
+                  initial={{ width: 0 }} 
+                  whileInView={{ width: `${s.level}%` }} 
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="h-full bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" 
+                />
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 

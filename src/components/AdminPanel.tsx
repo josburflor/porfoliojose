@@ -103,7 +103,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
 
   const tabs = [
     { id: 'proyectos', label: 'Proyectos', icon: <Globe size={14} /> },
-    { id: 'habilidades', label: 'Habilidades', icon: <Settings size={14} /> },
+    { id: 'habilidades', label: 'Scroll', icon: <Settings size={14} /> },
     { id: 'servicios', label: 'Servicios', icon: <CreditCard size={14} /> },
     { id: 'testimonios', label: 'Testimonios', icon: <Star size={14} /> },
     { id: 'mensajes', label: 'Mensajes', icon: <MessageSquare size={14} /> },
