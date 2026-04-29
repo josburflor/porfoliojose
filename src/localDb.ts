@@ -132,8 +132,17 @@ export const onSnapshot = (ref: any, callback: (snap: any) => void) => {
   };
 
   window.addEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
+  
+  const storageHandler = (e: StorageEvent) => {
+    if (e.key === `local_db_${ref.path || ref.collection?.path}`) handler();
+  };
+  window.addEventListener('storage', storageHandler);
+
   handler(); 
-  return () => window.removeEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
+  return () => {
+    window.removeEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
+    window.removeEventListener('storage', storageHandler);
+  };
 };
 
 // --- SYNC ENGINE ---
