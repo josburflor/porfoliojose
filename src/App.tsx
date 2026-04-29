@@ -752,7 +752,7 @@ function AppContent() {
                 const message = formData.get('mensaje') as string;
 
                 try {
-                  // 1. Guardar en Firestore (Prioritario para el Panel Admin)
+                  // 1. Guardar en Firestore (Panel Admin)
                   const docRef = await addDoc(collection(db, 'messages'), {
                     name,
                     email,
@@ -764,14 +764,7 @@ function AppContent() {
 
                   console.log("Mensaje guardado en Firebase con ID:", docRef.id);
 
-                  // 2. Envío Automático al Correo (Formspree)
-                  fetch('https://formspree.io/f/mqakayzy', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre: name, correo: email, telefono: phone, mensaje: message })
-                  }).catch(e => console.warn("Fallo notificación externa:", e));
-
-                  // 3. Feedback inmediato
+                  // 2. Feedback inmediato
                   setContactSent(true);
                   currentForm.reset();
                 } catch (err) {
