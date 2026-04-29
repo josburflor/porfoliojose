@@ -698,21 +698,8 @@ function AppContent() {
             </h2>
             <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.3em]">Instagram Feed</p>
           </div>
-          <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-4xl mx-auto">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-              <a 
-                key={i} 
-                href="https://www.instagram.com/burgosdiseno/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="aspect-square bg-white/5 border border-white/10 hover:border-[#00f2ff]/50 transition-colors relative group overflow-hidden cursor-pointer block"
-              >
-                <img src={`https://picsum.photos/seed/instaporfolio${i}/400/400`} alt={`Instagram post ${i}`} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                <div className="absolute inset-0 bg-[#00f2ff]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                   <Instagram size={32} className="text-white drop-shadow-md" />
-                </div>
-              </a>
-            ))}
+          <div className="max-w-4xl mx-auto overflow-hidden rounded-xl border border-white/10 min-h-[300px] flex items-center justify-center">
+            <div className="elfsight-app-6d3f75bd-8c4c-4763-8b6b-dea67d865dee w-full" data-elfsight-app-lazy></div>
           </div>
           <div className="mt-12 text-center">
             <a 
