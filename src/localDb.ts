@@ -15,7 +15,7 @@ import {
   arrayUnion as firestoreArrayUnion
 } from 'firebase/firestore';
 
-const IS_LOCAL_MODE = localStorage.getItem('DEV_LOCAL_MODE') === 'true';
+const IS_LOCAL_MODE = localStorage.getItem('DEV_LOCAL_MODE') === 'true' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const localStore = {
   get: (key: string) => JSON.parse(localStorage.getItem(`local_db_${key}`) || '[]'),
@@ -61,7 +61,8 @@ export const doc = (dbRef: any, path: string, id: string) => {
 
 export const addDoc = async (coll: any, data: any) => {
   if (!coll.isLocal) return firestoreAddDoc(coll, data);
-  const docs = localStore.get(coll.path);
+  let docs = localStore.get(coll.path);
+  if (!Array.isArray(docs)) docs = [];
   const newDoc = { ...data, id: Math.random().toString(36).substr(2, 9) };
   docs.push(newDoc);
   localStore.set(coll.path, docs);
