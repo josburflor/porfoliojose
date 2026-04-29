@@ -700,13 +700,30 @@ function AppContent() {
           </div>
           <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-4xl mx-auto">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-              <div key={i} className="aspect-square bg-white/5 border border-white/10 hover:border-[#00f2ff]/50 transition-colors relative group overflow-hidden cursor-pointer">
+              <a 
+                key={i} 
+                href="https://www.instagram.com/burgosdiseno/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="aspect-square bg-white/5 border border-white/10 hover:border-[#00f2ff]/50 transition-colors relative group overflow-hidden cursor-pointer block"
+              >
                 <img src={`https://picsum.photos/seed/instaporfolio${i}/400/400`} alt={`Instagram post ${i}`} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
                 <div className="absolute inset-0 bg-[#00f2ff]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                    <Instagram size={32} className="text-white drop-shadow-md" />
                 </div>
-              </div>
+              </a>
             ))}
+          </div>
+          <div className="mt-12 text-center">
+            <a 
+              href="https://www.instagram.com/burgosdiseno/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 cyber-button"
+            >
+              <Instagram size={18} />
+              Seguir en Instagram
+            </a>
           </div>
         </div>
       </section>
