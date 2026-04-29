@@ -416,7 +416,7 @@ function AppContent() {
       </section>
 
       {/* Perfil: Neural Core */}
-      <section id="perfil" className="py-20 md:py-32 px-8">
+      <section id="perfil" className="py-20 md:py-32 px-8 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] bg-black/20 shadow-[0_0_30px_rgba(0,242,255,0.05)]">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="space-y-6 md:space-y-8">
             <div className="w-12 h-1 bg-[#00f2ff]" />
@@ -444,7 +444,7 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="conocimientos" className="py-20 md:py-32 px-8 bg-black/40">
+      <section id="conocimientos" className="py-20 md:py-32 px-8 bg-black/40 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
         <div className="max-w-6xl mx-auto">
           <div className="mb-12 md:mb-20 space-y-6 md:space-y-8">
             <div className="w-12 h-1 bg-[#00f2ff]" />
@@ -536,7 +536,7 @@ function AppContent() {
       </section>
 
       {/* Servicios: Pricing Section */}
-      <section id="servicios" className="py-24 px-8 bg-black/50">
+      <section id="servicios" className="py-24 px-8 bg-black/50 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
         <div className="max-w-6xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -593,7 +593,7 @@ function AppContent() {
       </section>
 
       {/* Testimonios: Client Feedback */}
-      <section id="testimonios" className="py-24 px-8 bg-black/40 border-t border-white/5">
+      <section id="testimonios" className="py-24 px-8 bg-black/40 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black mb-4 uppercase tracking-tighter">Experiencia <span className="text-[#00f2ff]">Cliente</span></h2>
@@ -685,6 +685,28 @@ function AppContent() {
                 <button type="submit" className="w-full cyber-button py-4 font-bold uppercase tracking-widest text-[12px]">Publicar_Testimonio</button>
               </form>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Instagram Grid */}
+      <section id="instagram" className="py-24 px-8 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)] bg-black/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4 uppercase tracking-tighter">
+              Galería <span className="text-[#00f2ff]">Social</span>
+            </h2>
+            <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.3em]">Instagram Feed</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-4xl mx-auto">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+              <div key={i} className="aspect-square bg-white/5 border border-white/10 hover:border-[#00f2ff]/50 transition-colors relative group overflow-hidden cursor-pointer">
+                <img src={`https://picsum.photos/seed/instaporfolio${i}/400/400`} alt={`Instagram post ${i}`} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                <div className="absolute inset-0 bg-[#00f2ff]/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                   <Instagram size={32} className="text-white drop-shadow-md" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
