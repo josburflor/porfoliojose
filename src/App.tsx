@@ -100,15 +100,11 @@ function AppContent() {
     let animationId: number;
     const scroll = () => {
       if (scrollRef.current && !isHoveringScroll && !isDragging) {
-        scrollRef.current.scrollLeft += 1; // Constant smooth speed
+        scrollRef.current.scrollLeft += 0.5; // Slower, more elegant speed
         
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        
-        // Infinite loop logic:
-        // We will have 3 sets of skills. [A][B][C]
-        // When we reach the end of B, we jump back to the start of B.
-        // B starts at scrollWidth / 3.
+        const { scrollLeft, scrollWidth } = scrollRef.current;
         const oneThird = scrollWidth / 3;
+
         if (scrollLeft >= oneThird * 2) {
           scrollRef.current.scrollLeft = oneThird;
         } else if (scrollLeft <= 0) {
@@ -118,14 +114,21 @@ function AppContent() {
       animationId = requestAnimationFrame(scroll);
     };
     
-    // Initial position in the middle set
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth / 3;
-    }
-
     animationId = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(animationId);
-  }, [isHoveringScroll, isDragging, skills]); // Recalculate if skills change
+  }, [isHoveringScroll, isDragging]);
+
+  // Manejo de posición inicial independiente (evita saltos al hacer hover)
+  useEffect(() => {
+    if (scrollRef.current && visibleSkills.length > 0) {
+      const timer = setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollLeft = scrollRef.current.scrollWidth / 3;
+        }
+      }, 500); // Dar tiempo al renderizado
+      return () => clearTimeout(timer);
+    }
+  }, [visibleSkills.length]);
 
   // Dynamic Data States with Fallback
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
@@ -501,8 +504,12 @@ function AppContent() {
       </section>
 
       <section id="conocimientos" className="py-12 md:py-20 w-full overflow-hidden relative group">
+        {/* Máscara de desvanecimiento para estética premium */}
+        <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#080808] to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#080808] to-transparent z-20 pointer-events-none" />
+        
         <div 
-          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 no-scrollbar cursor-grab active:cursor-grabbing select-none"
+          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 no-scrollbar cursor-grab active:cursor-grabbing select-none relative z-10"
           ref={scrollRef}
           onMouseEnter={() => setIsHoveringScroll(true)}
           onMouseLeave={() => {
