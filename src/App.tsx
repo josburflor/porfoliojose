@@ -73,48 +73,59 @@ function AppContent() {
 
   // Scroll variables
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollDir = useRef<number>(1);
   const [isHoveringScroll, setIsHoveringScroll] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeftState, setScrollLeftState] = useState(0);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleDragStart = (x: number) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setStartX(x - scrollRef.current.offsetLeft);
     setScrollLeftState(scrollRef.current.scrollLeft);
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const handleDragMove = (x: number) => {
+    if (!isDragging || !scrollRef.current) return;
+    const currentX = x - scrollRef.current.offsetLeft;
+    const walk = (currentX - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeftState - walk;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    scrollRef.current.scrollLeft = scrollLeftState - walk;
+  const handleDragEnd = () => {
+    setIsDragging(false);
   };
 
   useEffect(() => {
     let animationId: number;
     const scroll = () => {
       if (scrollRef.current && !isHoveringScroll && !isDragging) {
-        const prevScroll = scrollRef.current.scrollLeft;
-        scrollRef.current.scrollLeft += scrollDir.current * 0.5; // Smoother speed
+        scrollRef.current.scrollLeft += 1; // Constant smooth speed
         
-        // Si no avanzó nada, significa que chocó con un borde (inicio o final). Invertimos dirección.
-        if (Math.abs(scrollRef.current.scrollLeft - prevScroll) < 0.1) {
-          scrollDir.current *= -1;
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        
+        // Infinite loop logic:
+        // We will have 3 sets of skills. [A][B][C]
+        // When we reach the end of B, we jump back to the start of B.
+        // B starts at scrollWidth / 3.
+        const oneThird = scrollWidth / 3;
+        if (scrollLeft >= oneThird * 2) {
+          scrollRef.current.scrollLeft = oneThird;
+        } else if (scrollLeft <= 0) {
+          scrollRef.current.scrollLeft = oneThird;
         }
       }
       animationId = requestAnimationFrame(scroll);
     };
+    
+    // Initial position in the middle set
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth / 3;
+    }
+
     animationId = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(animationId);
-  }, [isHoveringScroll, isDragging]);
+  }, [isHoveringScroll, isDragging, skills]); // Recalculate if skills change
 
   // Dynamic Data States with Fallback
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
@@ -491,20 +502,23 @@ function AppContent() {
 
       <section id="conocimientos" className="py-12 md:py-20 w-full overflow-hidden relative group">
         <div 
-          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 no-scrollbar cursor-grab active:cursor-grabbing"
+          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 no-scrollbar cursor-grab active:cursor-grabbing select-none"
           ref={scrollRef}
           onMouseEnter={() => setIsHoveringScroll(true)}
           onMouseLeave={() => {
             setIsHoveringScroll(false);
-            setIsDragging(false);
+            handleDragEnd();
           }}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
+          onMouseDown={(e) => handleDragStart(e.pageX)}
+          onMouseUp={handleDragEnd}
+          onMouseMove={(e) => handleDragMove(e.pageX)}
+          onTouchStart={(e) => handleDragStart(e.touches[0].pageX)}
+          onTouchMove={(e) => handleDragMove(e.touches[0].pageX)}
+          onTouchEnd={handleDragEnd}
         >
-          {visibleSkills.map((s, idx) => (
+          {[...visibleSkills, ...visibleSkills, ...visibleSkills].map((s, idx) => (
             <motion.div 
-              key={idx}
+              key={`${s.id}-${idx}`}
               whileHover={{ y: -5, scale: 1.02 }}
               className="min-w-[280px] md:min-w-[320px] glass-panel p-6 border-l-4 border-l-[#00f2ff] hover:bg-[#00f2ff]/10 hover:shadow-[0_0_30px_rgba(0,242,255,0.15)] transition-all relative overflow-hidden flex-shrink-0 cursor-pointer"
             >
