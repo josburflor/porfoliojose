@@ -57,19 +57,37 @@ export default function App() {
 
 function AppContent() {
   const { user, isAdmin, login, resetPassword, logout } = useAuth();
+  
+  // UI State
   const [cat, setCat] = useState('Todos');
   const [open, setOpen] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  
-  // Login form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [resetSent, setResetSent] = useState(false);
   const [contactSent, setContactSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  // Data State
+  const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
+  const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
+  const [services, setServices] = useState<any[]>([]); 
+  const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
+  const [profile, setProfile] = useState(BACKUP_PROFILE);
+
+  // Memoized Values
+  const visibleSkills = useMemo(() => {
+    return (skills || []).filter(s => !general?.hiddenIds?.includes(s.id));
+  }, [skills, general?.hiddenIds]);
+
+  const visibleProjects = useMemo(() => {
+    return (projects || []).filter(p => !general?.hiddenIds?.includes(p.id));
+  }, [projects, general?.hiddenIds]);
 
   // Scroll variables
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -120,7 +138,7 @@ function AppContent() {
 
   // Manejo de posición inicial independiente (evita saltos al hacer hover)
   useEffect(() => {
-    if (scrollRef.current && visibleSkills.length > 0) {
+    if (scrollRef.current && (visibleSkills || []).length > 0) {
       const timer = setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollLeft = scrollRef.current.scrollWidth / 3;
@@ -128,16 +146,7 @@ function AppContent() {
       }, 500); // Dar tiempo al renderizado
       return () => clearTimeout(timer);
     }
-  }, [visibleSkills.length]);
-
-  // Dynamic Data States with Fallback
-  const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
-  const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
-  const [services, setServices] = useState<any[]>([]); // Se cargará dinámicamente
-  const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
-  const [profile, setProfile] = useState(BACKUP_PROFILE);
+  }, [(visibleSkills || []).length]);
 
   const handleResetPassword = async () => {
     if (!email) {
@@ -322,13 +331,7 @@ function AppContent() {
 
   const categories = ['Todos', 'App', 'Diseño Web', 'Wordpress', 'Figma', 'Animaciones', 'Prestashop'];
   
-  const visibleSkills = useMemo(() => {
-    return skills.filter(s => !general.hiddenIds?.includes(s.id));
-  }, [skills, general.hiddenIds]);
 
-  const visibleProjects = useMemo(() => {
-    return projects.filter(p => !general.hiddenIds?.includes(p.id));
-  }, [projects, general.hiddenIds]);
 
   const filtered = useMemo(() => cat === 'Todos' ? visibleProjects : visibleProjects.filter(p => p.cat === cat), [cat, visibleProjects]);
 
