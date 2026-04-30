@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './AuthContext';
-import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc } from './localDb';
+import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc, updateDoc } from './localDb';
 import { db } from './firebase';
 import { AdminPanel } from './components/AdminPanel';
 import { BACKUP_PROFILE, BACKUP_GENERAL, BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';
@@ -75,16 +75,38 @@ function AppContent() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollDir = useRef<number>(1);
   const [isHoveringScroll, setIsHoveringScroll] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeftState(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeftState - walk;
+  };
 
   useEffect(() => {
     let animationId: number;
     const scroll = () => {
-      if (scrollRef.current && !isHoveringScroll) {
+      if (scrollRef.current && !isHoveringScroll && !isDragging) {
         const prevScroll = scrollRef.current.scrollLeft;
-        scrollRef.current.scrollLeft += scrollDir.current;
+        scrollRef.current.scrollLeft += scrollDir.current * 0.5; // Smoother speed
         
         // Si no avanzó nada, significa que chocó con un borde (inicio o final). Invertimos dirección.
-        if (scrollRef.current.scrollLeft === prevScroll) {
+        if (Math.abs(scrollRef.current.scrollLeft - prevScroll) < 0.1) {
           scrollDir.current *= -1;
         }
       }
@@ -92,7 +114,7 @@ function AppContent() {
     };
     animationId = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(animationId);
-  }, [isHoveringScroll]);
+  }, [isHoveringScroll, isDragging]);
 
   // Dynamic Data States with Fallback
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
@@ -231,13 +253,13 @@ function AppContent() {
         try {
           const projectSnap = await getDocs(collection(db, 'projects'));
           if (projectSnap.empty) {
-            for (const p of PROJECTS) {
+            for (const p of BACKUP_PROJECTS) {
               await addDoc(collection(db, 'projects'), p);
             }
           }
           const skillSnap = await getDocs(collection(db, 'skills'));
           if (skillSnap.empty) {
-            for (const s of INITIAL_SKILLS) {
+            for (const s of BACKUP_SKILLS) {
               await addDoc(collection(db, 'skills'), s);
             }
           }
@@ -469,10 +491,16 @@ function AppContent() {
 
       <section id="conocimientos" className="py-12 md:py-20 w-full overflow-hidden relative group">
         <div 
-          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 custom-scrollbar scroll-smooth"
+          className="flex gap-6 overflow-x-auto pb-8 pt-4 px-8 no-scrollbar cursor-grab active:cursor-grabbing"
           ref={scrollRef}
           onMouseEnter={() => setIsHoveringScroll(true)}
-          onMouseLeave={() => setIsHoveringScroll(false)}
+          onMouseLeave={() => {
+            setIsHoveringScroll(false);
+            setIsDragging(false);
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
         >
           {visibleSkills.map((s, idx) => (
             <motion.div 
