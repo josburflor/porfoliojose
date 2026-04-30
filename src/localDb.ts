@@ -165,6 +165,7 @@ export const triggerSync = async () => {
     });
     return await response.json();
   } catch (err) {
-    throw new Error('El servidor de sincronización no está corriendo en http://localhost:3005');
+    console.warn('El servidor de sincronización (puerto 3005) está apagado. Datos guardados en LocalStorage.');
+    return { status: 'local_only', message: 'Guardado local exitoso. (Git sync apagado)' };
   }
 };

@@ -474,7 +474,7 @@ function AppContent() {
           onMouseEnter={() => setIsHoveringScroll(true)}
           onMouseLeave={() => setIsHoveringScroll(false)}
         >
-          {[...visibleSkills, ...visibleSkills, ...visibleSkills, ...visibleSkills].map((s, idx) => (
+          {visibleSkills.map((s, idx) => (
             <motion.div 
               key={idx}
               whileHover={{ y: -5, scale: 1.02 }}
