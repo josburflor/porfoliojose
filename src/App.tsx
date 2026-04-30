@@ -73,16 +73,19 @@ function AppContent() {
 
   // Scroll variables
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollDir = useRef<number>(1);
   const [isHoveringScroll, setIsHoveringScroll] = useState(false);
 
   useEffect(() => {
     let animationId: number;
     const scroll = () => {
       if (scrollRef.current && !isHoveringScroll) {
-        scrollRef.current.scrollLeft += 1;
-        // Reiniciar cuando llegue al final para dar efecto infinito
-        if (scrollRef.current.scrollLeft >= scrollRef.current.scrollWidth - scrollRef.current.clientWidth - 1) {
-          scrollRef.current.scrollLeft = 0;
+        const prevScroll = scrollRef.current.scrollLeft;
+        scrollRef.current.scrollLeft += scrollDir.current;
+        
+        // Si no avanzó nada, significa que chocó con un borde (inicio o final). Invertimos dirección.
+        if (scrollRef.current.scrollLeft === prevScroll) {
+          scrollDir.current *= -1;
         }
       }
       animationId = requestAnimationFrame(scroll);
