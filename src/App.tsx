@@ -635,8 +635,7 @@ function AppContent() {
               >
                 {s.img && (
                   <div className="w-full h-40 overflow-hidden relative border-b border-white/10">
-                    <img src={s.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    <img src={s.img} className="w-full h-full object-cover transition-all duration-700" />
                   </div>
                 )}
                 <div className="p-8 flex-1 flex flex-col">
