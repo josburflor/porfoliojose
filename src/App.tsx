@@ -507,6 +507,13 @@ function AppContent() {
       </section>
 
       <section id="conocimientos" className="py-12 md:py-20 w-full overflow-hidden relative group">
+        <div className="max-w-6xl mx-auto px-8 mb-12">
+          <div className="space-y-4">
+            <div className="w-12 h-1 bg-[#00f2ff]" />
+            <h2 className="text-3xl md:text-5xl font-black font-mono text-[#00f2ff] tracking-tighter italic uppercase">CONOCIMIENTOS</h2>
+          </div>
+        </div>
+
         {/* Máscara de desvanecimiento para estética premium */}
         <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#080808] to-transparent z-20 pointer-events-none" />
         <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#080808] to-transparent z-20 pointer-events-none" />
