@@ -25,7 +25,9 @@ import {
   LogOut,
   MessageCircle,
   Search,
-  Star
+  Star,
+  Quote,
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './AuthContext';
@@ -694,48 +696,118 @@ function AppContent() {
       </section>
 
       {/* Testimonios: Client Feedback */}
-      <section id="testimonios" className="py-24 px-8 bg-black/40 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4 uppercase tracking-tighter">Experiencia <span className="text-[#00f2ff]">Cliente</span></h2>
-            <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.3em]">Lo que dicen quienes ya confiaron en el sistema</p>
+      <section id="testimonios" className="py-24 px-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00f2ff]/5 to-transparent opacity-30 pointer-events-none" />
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+            <div className="text-center md:text-left">
+              <div className="w-12 h-1 bg-[#00f2ff] mb-4 mx-auto md:mx-0" />
+              <h2 className="text-3xl md:text-5xl font-black mb-2 uppercase tracking-tighter glow-text">
+                Experiencia <span className="text-[#00f2ff]">Cliente</span>
+              </h2>
+              <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.3em]">
+                Feedback directo desde el centro de control
+              </p>
+            </div>
+            
+            <div className="hidden md:flex gap-4">
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('testimonials-slider');
+                  if (el) el.scrollBy({ left: -400, behavior: 'smooth' });
+                }}
+                className="p-3 border border-[#00f2ff]/30 text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all rounded-full"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('testimonials-slider');
+                  if (el) el.scrollBy({ left: 400, behavior: 'smooth' });
+                }}
+                className="p-3 border border-[#00f2ff]/30 text-[#00f2ff] hover:bg-[#00f2ff] hover:text-black transition-all rounded-full"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            id="testimonials-slider"
+            className="flex gap-6 overflow-x-auto pb-12 no-scrollbar snap-x snap-mandatory scroll-smooth"
+          >
             {testimonials.map((t, idx) => (
               <motion.div 
                 key={t.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                className="bg-white/5 border border-white/10 p-8 relative"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="min-w-full md:min-w-[400px] snap-center"
               >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className={`w-2 h-2 rounded-full ${i < (t.rating || 5) ? 'bg-[#00f2ff]' : 'bg-white/10'}`} />
-                  ))}
-                </div>
-                <p className="text-sm text-white/80 italic mb-6 leading-relaxed">"{t.comment}"</p>
-                <div className="flex items-center gap-3">
-                  {t.img ? (
-                    <img src={t.img} className="w-10 h-10 object-cover rounded-sm border border-[#00f2ff]/30" />
-                  ) : (
-                    <div className="w-10 h-10 bg-[#00f2ff]/20 flex items-center justify-center font-mono text-[10px] text-[#00f2ff]">
-                      {t.name?.charAt(0)}
+                <div className="h-full bg-white/[0.03] backdrop-blur-md border border-white/10 p-10 relative group hover:border-[#00f2ff]/40 transition-all duration-500 rounded-[2rem] overflow-hidden">
+                  <div className="absolute -top-4 -right-4 text-[#00f2ff]/10 group-hover:text-[#00f2ff]/20 transition-colors pointer-events-none">
+                    <Quote size={120} />
+                  </div>
+                  
+                  <div className="flex gap-1 mb-8">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={14} 
+                        className={i < (t.rating || 5) ? 'text-[#00f2ff] fill-[#00f2ff]' : 'text-white/10'} 
+                      />
+                    ))}
+                  </div>
+
+                  <p className="text-lg text-white/80 font-light italic mb-10 leading-relaxed relative z-10">
+                    "{t.comment}"
+                  </p>
+
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-[#00f2ff] blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
+                      {t.img ? (
+                        <img 
+                          src={t.img} 
+                          className="w-14 h-14 object-cover rounded-2xl border border-[#00f2ff]/30 relative z-10" 
+                          alt={t.name}
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-[#00f2ff]/10 flex items-center justify-center font-mono text-lg text-[#00f2ff] rounded-2xl border border-[#00f2ff]/30 relative z-10">
+                          {t.name?.charAt(0)}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest">{t.name}</p>
-                    <p className="text-[8px] text-white/20 font-mono">{t.date || 'Cliente Verificado'}</p>
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-widest text-white">{t.name}</p>
+                      <p className="text-[10px] text-[#00f2ff] font-mono uppercase tracking-widest opacity-60">
+                        {t.date || 'Cliente Verificado'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
+        </div>
 
           {/* Formulario de Comentarios */}
-          <div className="mt-20 max-w-2xl mx-auto">
-            <div className="bg-black/60 border border-[#00f2ff]/20 p-10 backdrop-blur-xl shadow-[0_0_50px_rgba(0,242,255,0.05)]">
-              <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-[0.3em] mb-8 text-center">Dejar una Reseña del Sistema</h3>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 max-w-2xl mx-auto"
+          >
+            <div className="bg-white/[0.02] backdrop-blur-3xl border border-[#00f2ff]/20 p-10 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,242,255,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00f2ff]/50 to-transparent" />
+              
+              <div className="text-center mb-10">
+                <h3 className="font-mono text-[12px] text-[#00f2ff] uppercase tracking-[0.4em] mb-2">Transmisión de Feedback</h3>
+                <p className="text-white/40 text-[10px] uppercase tracking-widest">Registra tu experiencia en la red</p>
+              </div>
+
               <form 
                 onSubmit={async (e) => {
                   e.preventDefault();
@@ -767,26 +839,53 @@ function AppContent() {
                     alert('Error en la transmisión de datos.');
                   }
                 }}
-                className="space-y-6"
+                className="space-y-8"
               >
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="font-mono text-[9px] uppercase text-gray-500 tracking-widest">Identidad (Nombre/Empresa)</label>
-                    <input name="name" required type="text" className="w-full bg-white/5 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff] transition-all" />
+                  <div className="space-y-3">
+                    <label className="font-mono text-[10px] uppercase text-[#00f2ff]/60 tracking-widest ml-1">Identidad</label>
+                    <input 
+                      name="name" 
+                      required 
+                      type="text" 
+                      placeholder="Nombre o Empresa"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none focus:border-[#00f2ff] focus:bg-[#00f2ff]/5 transition-all placeholder:text-white/10" 
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <label className="font-mono text-[9px] uppercase text-gray-500 tracking-widest">Tu Foto (Opcional)</label>
-                    <input name="photo" type="file" accept="image/*" className="w-full bg-white/5 border border-white/10 p-3 text-[9px] text-gray-500 file:bg-[#00f2ff]/10 file:text-[#00f2ff] file:border-0 file:px-3 file:py-1 file:mr-4" />
+                  <div className="space-y-3">
+                    <label className="font-mono text-[10px] uppercase text-[#00f2ff]/60 tracking-widest ml-1">Avatar_Upload</label>
+                    <div className="relative group">
+                      <input 
+                        name="photo" 
+                        type="file" 
+                        accept="image/*" 
+                        className="w-full opacity-0 absolute inset-0 cursor-pointer z-10" 
+                      />
+                      <div className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-[10px] text-white/40 flex items-center justify-between group-hover:border-[#00f2ff]/30 transition-all">
+                        <span>Seleccionar archivo...</span>
+                        <ExternalLink size={14} className="text-[#00f2ff]" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="font-mono text-[9px] uppercase text-gray-500 tracking-widest">Mensaje de Feedback</label>
-                  <textarea name="comment" required className="w-full bg-white/5 border border-white/10 p-4 text-xs text-white outline-none h-32 resize-none focus:border-[#00f2ff] transition-all" />
+                <div className="space-y-3">
+                  <label className="font-mono text-[10px] uppercase text-[#00f2ff]/60 tracking-widest ml-1">Mensaje</label>
+                  <textarea 
+                    name="comment" 
+                    required 
+                    placeholder="Escribe tu reseña aquí..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white outline-none h-32 resize-none focus:border-[#00f2ff] focus:bg-[#00f2ff]/5 transition-all placeholder:text-white/10" 
+                  />
                 </div>
-                <button type="submit" className="w-full cyber-button py-4 font-bold uppercase tracking-widest text-[12px]">Publicar_Testimonio</button>
+                <button 
+                  type="submit" 
+                  className="w-full bg-[#00f2ff] text-black py-4 rounded-xl font-black uppercase tracking-[0.3em] text-[12px] hover:shadow-[0_0_30px_rgba(0,242,255,0.4)] transition-all active:scale-[0.98]"
+                >
+                  Enviar_Testimonio
+                </button>
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -816,88 +915,132 @@ function AppContent() {
         </div>
       </section>
 
-      <section id="contacto" className="py-32 px-8 glass-panel border-y border-[#00f2ff]/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-20 space-y-8">
-            <div className="w-12 h-1 bg-[#00f2ff]" />
-            <h2 className="text-4xl font-bold font-mono text-[#00f2ff] tracking-tight italic uppercase">ESTABLECER CONTACTO</h2>
+      <section id="contacto" className="py-32 px-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#00f2ff]/5 via-transparent to-[#00f2ff]/5 pointer-events-none" />
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            {/* Info Side */}
+            <div className="space-y-12">
+              <div className="space-y-6">
+                <div className="w-12 h-1 bg-[#00f2ff]" />
+                <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">
+                  ¿LISTO PARA EL <br /> <span className="text-[#00f2ff] glow-text">SIGUIENTE NIVEL?</span>
+                </h2>
+                <p className="text-white/50 font-mono text-sm md:text-lg max-w-md leading-relaxed">
+                  Establece una conexión directa con el sistema para iniciar tu proyecto digital.
+                </p>
+              </div>
+
+              <div className="space-y-8">
+                <div className="flex items-center gap-6 group">
+                  <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-[#00f2ff] group-hover:bg-[#00f2ff] group-hover:text-black transition-all">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] uppercase text-white/30 tracking-widest">Protocolo_Email</p>
+                    <p className="text-lg font-bold text-white tracking-tight">contacto@burgosdiseno.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 group">
+                  <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-[#00f2ff] group-hover:bg-[#00f2ff] group-hover:text-black transition-all">
+                    <MessageCircle size={24} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] uppercase text-white/30 tracking-widest">Enlace_WhatsApp</p>
+                    <p className="text-lg font-bold text-white tracking-tight">+34 613 476 029</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 flex gap-4">
+                {general.socialGithub && <a href={ensureAbsoluteUrl(general.socialGithub)} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/5 border border-white/10 rounded-xl hover:text-[#00f2ff] hover:border-[#00f2ff]/50 transition-all"><Github size={20} /></a>}
+                {general.socialLinkedin && <a href={ensureAbsoluteUrl(general.socialLinkedin)} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/5 border border-white/10 rounded-xl hover:text-[#00f2ff] hover:border-[#00f2ff]/50 transition-all"><Linkedin size={20} /></a>}
+                {general.socialInstagram && <a href={ensureAbsoluteUrl(general.socialInstagram)} target="_blank" rel="noopener noreferrer" className="p-4 bg-white/5 border border-white/10 rounded-xl hover:text-[#00f2ff] hover:border-[#00f2ff]/50 transition-all"><Instagram size={20} /></a>}
+              </div>
+            </div>
+
+            {/* Form Side */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#00f2ff]/10 blur-[80px] rounded-full opacity-20 pointer-events-none" />
+              
+              <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.3)] relative z-10">
+                {contactSent ? (
+                  <motion.div 
+                    initial={{ scale: 0.9, opacity: 0 }} 
+                    animate={{ scale: 1, opacity: 1 }} 
+                    className="py-12 text-center space-y-6"
+                  >
+                    <div className="w-20 h-20 bg-[#00f2ff] rounded-full flex items-center justify-center text-black mx-auto shadow-[0_0_30px_rgba(0,242,255,0.4)]">
+                      <CheckCircle2 size={40} />
+                    </div>
+                    <h3 className="text-2xl font-bold font-mono text-[#00f2ff] uppercase tracking-widest">Transmisión Exitosa</h3>
+                    <p className="text-white/60 font-mono text-xs uppercase tracking-wider">Tu mensaje ha sido cifrado y enviado al sistema central.</p>
+                    <button 
+                      onClick={() => setContactSent(false)} 
+                      className="text-[#00f2ff] font-mono text-[10px] uppercase border-b border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all pt-4"
+                    >
+                      Enviar otro mensaje
+                    </button>
+                  </motion.div>
+                ) : (
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setIsSending(true);
+                      const currentForm = e.currentTarget;
+                      const formData = new FormData(currentForm);
+                      const name = formData.get('nombre') as string;
+                      const email = formData.get('correo') as string;
+                      const phone = formData.get('telefono') as string;
+                      const message = formData.get('mensaje') as string;
+
+                      try {
+                        await addDoc(collection(db, 'messages'), {
+                          name,
+                          email,
+                          phone,
+                          message,
+                          date: new Date().toISOString(),
+                          status: 'unread'
+                        });
+                        setContactSent(true);
+                        currentForm.reset();
+                      } catch (err: any) {
+                        alert('Error al transmitir datos: ' + err.message);
+                      } finally {
+                        setIsSending(false);
+                      }
+                    }} 
+                    className="space-y-6"
+                  >
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="font-mono text-[10px] uppercase tracking-widest text-[#00f2ff]/60 ml-1">Nombre</label>
+                        <input name="nombre" type="text" required className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-xs text-white focus:border-[#00f2ff] outline-none transition-all" placeholder="ID_USUARIO" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="font-mono text-[10px] uppercase tracking-widest text-[#00f2ff]/60 ml-1">Email</label>
+                        <input name="correo" type="email" required className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-xs text-white focus:border-[#00f2ff] outline-none transition-all" placeholder="CANAL_DATOS" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-[#00f2ff]/60 ml-1">Número de Teléfono</label>
+                      <input name="telefono" type="tel" required className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-xs text-white focus:border-[#00f2ff] outline-none transition-all" placeholder="+XX XXX XXX XXX" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-[#00f2ff]/60 ml-1">Solicitud</label>
+                      <textarea name="mensaje" required className="w-full bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-xs text-white focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="DESCRIBE_TU_PROYECTO..." />
+                    </div>
+                    <button disabled={isSending} className="w-full bg-[#00f2ff] text-black h-14 rounded-xl flex items-center justify-center gap-4 text-[14px] font-black uppercase tracking-[0.3em] hover:shadow-[0_0_30px_rgba(0,242,255,0.4)] transition-all active:scale-[0.98]">
+                      {isSending ? 'Transmitiendo...' : 'Iniciar_Conexión'} <Send size={16} />
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
           </div>
-          {contactSent ? (
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} 
-              animate={{ scale: 1, opacity: 1 }} 
-              className="bg-[#00f2ff]/5 border border-[#00f2ff]/30 p-12 text-center space-y-6 backdrop-blur-xl"
-            >
-              <div className="w-20 h-20 bg-[#00f2ff] rounded-full flex items-center justify-center text-black mx-auto shadow-[0_0_30px_rgba(0,242,255,0.4)]">
-                <CheckCircle2 size={40} />
-              </div>
-              <h3 className="text-2xl font-bold font-mono text-[#00f2ff] uppercase tracking-widest">Transmisión Exitosa</h3>
-              <p className="text-white/60 font-mono text-sm uppercase tracking-wider">Tu mensaje ha sido cifrado y enviado al sistema central. <br/> Recibirás una respuesta pronto.</p>
-              <button 
-                onClick={() => setContactSent(false)} 
-                className="text-[#00f2ff] font-mono text-[10px] uppercase border-b border-[#00f2ff]/30 hover:border-[#00f2ff] transition-all pt-4"
-              >
-                Enviar otro mensaje
-              </button>
-            </motion.div>
-          ) : (
-            <form 
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setIsSending(true);
-                const currentForm = e.currentTarget;
-                const formData = new FormData(currentForm);
-                const name = formData.get('nombre') as string;
-                const email = formData.get('correo') as string;
-                const phone = formData.get('telefono') as string;
-                const message = formData.get('mensaje') as string;
-
-                try {
-                  // 1. Guardar en Firestore (Panel Admin)
-                  const docRef = await addDoc(collection(db, 'messages'), {
-                    name,
-                    email,
-                    phone,
-                    message,
-                    date: new Date().toISOString(),
-                    status: 'unread'
-                  });
-
-                  console.log("Mensaje guardado en Firebase con ID:", docRef.id);
-
-                  // 2. Feedback inmediato
-                  setContactSent(true);
-                  currentForm.reset();
-                } catch (err: any) {
-                  console.error("Error crítico de base de datos:", err);
-                  alert('Error al transmitir datos a la base de datos: ' + err.message + '\n\nPor favor, revisa tu conexión o avísame de este error exacto.');
-                } finally {
-                  setIsSending(false);
-                }
-              }} 
-              className="grid sm:grid-cols-2 gap-6 text-left"
-            >
-              <div className="space-y-2">
-                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Nombre</label>
-                <input name="nombre" type="text" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Escribe tu nombre..." />
-              </div>
-              <div className="space-y-2">
-                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Email</label>
-                <input name="correo" type="email" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="correo@ejemplo.com" />
-              </div>
-              <div className="sm:col-span-2 space-y-2">
-                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Número de Teléfono (con código de área)</label>
-                <input name="telefono" type="tel" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all" placeholder="Ej: +34 600 000 000" />
-              </div>
-              <div className="sm:col-span-2 space-y-2">
-                <label className="font-mono text-[14px] uppercase tracking-widest text-[#00f2ff]">Solicitud</label>
-                <textarea name="mensaje" required className="w-full bg-white/5 border border-white/10 p-4 font-mono text-xs focus:border-[#00f2ff] outline-none transition-all h-32 resize-none" placeholder="¿En qué puedo ayudarte?" />
-              </div>
-              <button disabled={isSending} className="sm:col-span-2 cyber-button w-full h-14 flex items-center justify-center gap-4 text-[18px] font-bold">
-                {isSending ? 'Transmitiendo...' : 'Transmitir_Datos'} <Send size={16} />
-              </button>
-            </form>
-          )}
         </div>
       </section>
 
