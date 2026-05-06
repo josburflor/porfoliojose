@@ -33,6 +33,7 @@ import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, a
 import { db } from './firebase';
 import { AdminPanel } from './components/AdminPanel';
 import { BACKUP_PROFILE, BACKUP_GENERAL, BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';
+import { BACKUP_SERVICES } from './data/servicesBackup';
 
 // --- Icon Mapping Utility ---
 const IconMap: Record<string, any> = {
@@ -76,7 +77,7 @@ function AppContent() {
   // Data State
   const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
   const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
-  const [services, setServices] = useState<any[]>([]); 
+  const [services, setServices] = useState<any[]>(BACKUP_SERVICES); 
   const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
   const [messages, setMessages] = useState<any[]>([]);
   const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
@@ -219,8 +220,8 @@ function AppContent() {
           profile: profS.exists() ? profS.data() : BACKUP_PROFILE,
           projects: projS.empty ? BACKUP_PROJECTS : projS.docs.map(d => ({ id: d.id, ...d.data() })),
           skills: skillS.empty ? BACKUP_SKILLS : skillS.docs.map(d => ({ id: d.id, ...d.data() })),
-          services: servS.empty ? [] : servS.docs.map(d => ({ id: d.id, ...d.data() })),
-          testimonials: testS.empty ? [] : testS.docs.map(d => ({ id: d.id, ...d.data() }))
+          services: servS.empty ? BACKUP_SERVICES : servS.docs.map(d => ({ id: d.id, ...d.data() })),
+          testimonials: testS.empty ? BACKUP_TESTIMONIALS : testS.docs.map(d => ({ id: d.id, ...d.data() }))
         };
 
         setGeneral(newData.general);

@@ -93,15 +93,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
   };
 
   const handleSaveService = async (e: React.FormEvent) => {
-    e.preventDefault(); setIsSaving(true);
+    e.preventDefault();
+    console.log('AdminPanel: Guardando servicio', editingService);
+    setIsSaving(true);
     try {
       const { id, ...data } = editingService;
-      if (id) await updateDoc(doc(db, 'services', id), data);
-      else await addDoc(collection(db, 'services'), { ...data, order: services.length });
+      if (id) {
+        await updateDoc(doc(db, 'services', id), data);
+        alert('✅ Servicio actualizado con éxito');
+      } else {
+        await addDoc(collection(db, 'services'), { ...data, order: services.length });
+        alert('✅ Nuevo servicio creado con éxito');
+      }
       setEditingService(null);
-      setContMsg({ type: 'success', text: 'ACTUALIZADO' });
-    } catch (err: any) { setContMsg({ type: 'error', text: err.message }); }
-    finally { setIsSaving(false); }
+      setContMsg({ type: 'success', text: 'Sincronización completa' });
+    } catch (err: any) {
+      console.error('AdminPanel: Error al guardar servicio', err);
+      alert('❌ Error al guardar servicio: ' + err.message);
+      setContMsg({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDelete = async (coll: string, id: string) => {

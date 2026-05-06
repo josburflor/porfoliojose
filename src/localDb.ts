@@ -14,11 +14,25 @@ import {
   limit as firestoreLimit,
   arrayUnion as firestoreArrayUnion
 } from 'firebase/firestore';
+import { BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';
+import { BACKUP_SERVICES } from './data/servicesBackup';
+
 
 const IS_LOCAL_MODE = localStorage.getItem('DEV_LOCAL_MODE') === 'true' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const localStore = {
-  get: (key: string) => JSON.parse(localStorage.getItem(`local_db_${key}`) || '[]'),
+  get: (key: string) => {
+    const val = localStorage.getItem(`local_db_${key}`);
+    if (!val) {
+      if (key === 'projects') return BACKUP_PROJECTS;
+      if (key === 'skills') return BACKUP_SKILLS;
+      if (key === 'services') return BACKUP_SERVICES;
+      if (key === 'testimonials') return BACKUP_TESTIMONIALS;
+      return [];
+    }
+    return JSON.parse(val);
+  },
+
   set: (key: string, data: any) => localStorage.setItem(`local_db_${key}`, JSON.stringify(data))
 };
 
