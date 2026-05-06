@@ -78,9 +78,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
   };
 
   const handleDelete = async (coll: string, id: string) => {
+    console.log('AdminPanel: handleDelete', coll, id);
     if (!window.confirm('¿Eliminar definitivamente?')) return;
-    try { await deleteDoc(doc(db, coll, id)); }
-    catch (err: any) { setContMsg({ type: 'error', text: err.message }); }
+    try { 
+      await deleteDoc(doc(db, coll, id)); 
+      setContMsg({ type: 'success', text: 'Eliminado correctamente' });
+    } catch (err: any) { 
+      console.error('AdminPanel: delete error', err);
+      setContMsg({ type: 'error', text: err.message }); 
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, target: 'project' | 'hero' | 'profile') => {
@@ -214,8 +220,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => setEditingProject(p)} className="p-2 text-white/20 hover:text-[#00f2ff]"><Edit2 size={12} /></button>
-                        <button onClick={() => handleDelete('projects', p.id)} className="p-2 text-white/20 hover:text-red-500"><Trash2 size={12} /></button>
+                        <button 
+                          onClick={() => {
+                            console.log('AdminPanel: editing project', p);
+                            setEditingProject(p);
+                          }} 
+                          className="p-2.5 bg-white/5 rounded-lg text-white/30 hover:text-[#00f2ff] hover:bg-[#00f2ff]/10 transition-all"
+                          title="Modificar"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete('projects', p.id)} 
+                          className="p-2.5 bg-white/5 rounded-lg text-white/30 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
                   ))}
