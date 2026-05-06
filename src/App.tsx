@@ -742,47 +742,48 @@ function AppContent() {
                 key={t.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                whileHover={{ y: -10 }}
+                transition={{ delay: idx * 0.1, duration: 0.4 }}
                 viewport={{ once: true }}
-                className="min-w-full md:min-w-[400px] snap-center"
+                className="min-w-full md:min-w-[450px] snap-center py-4"
               >
-                <div className="h-full bg-white/[0.03] backdrop-blur-md border border-white/10 p-10 relative group hover:border-[#00f2ff]/40 transition-all duration-500 rounded-[2rem] overflow-hidden">
-                  <div className="absolute -top-4 -right-4 text-[#00f2ff]/10 group-hover:text-[#00f2ff]/20 transition-colors pointer-events-none">
-                    <Quote size={120} />
+                <div className="h-full bg-white/[0.03] backdrop-blur-md border border-white/10 p-12 relative group hover:border-[#00f2ff]/50 hover:bg-[#00f2ff]/5 hover:shadow-[0_20px_50px_rgba(0,242,255,0.1)] transition-all duration-500 rounded-[2.5rem] overflow-hidden">
+                  <div className="absolute -top-6 -right-6 text-[#00f2ff]/10 group-hover:text-[#00f2ff]/20 group-hover:scale-110 transition-all duration-700 pointer-events-none">
+                    <Quote size={150} />
                   </div>
                   
-                  <div className="flex gap-1 mb-8">
+                  <div className="flex gap-1.5 mb-8">
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i} 
-                        size={14} 
-                        className={i < (t.rating || 5) ? 'text-[#00f2ff] fill-[#00f2ff]' : 'text-white/10'} 
+                        size={16} 
+                        className={i < (t.rating || 5) ? 'text-[#00f2ff] fill-[#00f2ff] drop-shadow-[0_0_5px_rgba(0,242,255,0.5)]' : 'text-white/10'} 
                       />
                     ))}
                   </div>
 
-                  <p className="text-lg text-white/80 font-light italic mb-10 leading-relaxed relative z-10">
+                  <p className="text-xl text-white/90 font-light italic mb-12 leading-relaxed relative z-10 group-hover:text-white transition-colors">
                     "{t.comment}"
                   </p>
 
-                  <div className="flex items-center gap-4 relative z-10">
+                  <div className="flex items-center gap-6 relative z-10">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-[#00f2ff] blur-md opacity-20 group-hover:opacity-40 transition-opacity" />
+                      <div className="absolute inset-0 bg-[#00f2ff] blur-xl opacity-20 group-hover:opacity-60 transition-opacity duration-500" />
                       {t.img ? (
                         <img 
                           src={t.img} 
-                          className="w-14 h-14 object-cover rounded-2xl border border-[#00f2ff]/30 relative z-10" 
+                          className="w-20 h-20 object-cover rounded-[1.5rem] border-2 border-[#00f2ff]/30 group-hover:border-[#00f2ff] relative z-10 transition-all duration-500 group-hover:scale-105" 
                           alt={t.name}
                         />
                       ) : (
-                        <div className="w-14 h-14 bg-[#00f2ff]/10 flex items-center justify-center font-mono text-lg text-[#00f2ff] rounded-2xl border border-[#00f2ff]/30 relative z-10">
+                        <div className="w-20 h-20 bg-[#00f2ff]/10 flex items-center justify-center font-mono text-2xl text-[#00f2ff] rounded-[1.5rem] border-2 border-[#00f2ff]/30 group-hover:border-[#00f2ff] relative z-10 transition-all duration-500 group-hover:scale-105">
                           {t.name?.charAt(0)}
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-bold uppercase tracking-widest text-white">{t.name}</p>
-                      <p className="text-[10px] text-[#00f2ff] font-mono uppercase tracking-widest opacity-60">
+                      <p className="text-lg font-black uppercase tracking-widest text-white group-hover:text-[#00f2ff] transition-colors">{t.name}</p>
+                      <p className="text-xs text-[#00f2ff] font-mono uppercase tracking-[0.2em] opacity-60">
                         {t.date || 'Cliente Verificado'}
                       </p>
                     </div>
