@@ -606,25 +606,25 @@ function AppContent() {
                     </div>
                   )}
                   
-                  {/* Floating Content 'Card' at the bottom - EXTREME TRANSPARENCY */}
+                  {/* Floating Content 'Card' at the bottom - MAXIMUM TRANSPARENCY (GLASS ONLY) */}
                   <div className="absolute inset-x-4 bottom-4 z-20">
-                    <div className="bg-white/5 backdrop-blur-3xl p-6 rounded-[2rem] border border-white/5 shadow-2xl group-hover:border-[#00f2ff]/20 transition-all duration-500">
-                      <span className="font-mono text-[9px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.5em] opacity-80">{p.cat}</span>
-                      <h3 className="text-xl font-black tracking-tighter uppercase mb-4 text-white leading-tight group-hover:text-[#00f2ff] transition-colors drop-shadow-md">{p.title}</h3>
+                    <div className="bg-white/[0.02] backdrop-blur-3xl p-6 rounded-[2.5rem] border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)] group-hover:border-[#00f2ff]/10 transition-all duration-700">
+                      <span className="font-mono text-[8px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.6em] opacity-60">{p.cat}</span>
+                      <h3 className="text-lg font-black tracking-tighter uppercase mb-4 text-white leading-tight group-hover:text-[#00f2ff] transition-colors drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{p.title}</h3>
                       
                       <div className="flex flex-wrap gap-1 mb-6">
-                        {p.tech.map(t => <span key={t} className="text-[8px] font-mono border border-white/5 bg-white/5 px-2 py-0.5 rounded text-white/30 uppercase tracking-tighter">#{t}</span>)}
+                        {p.tech.map(t => <span key={t} className="text-[7px] font-mono border border-white/5 bg-white/[0.01] px-1.5 py-0.5 rounded-full text-white/20 uppercase tracking-widest">#{t}</span>)}
                       </div>
                       
                       <a 
                         href={ensureAbsoluteUrl(p.link)} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between w-full p-1 text-[#00f2ff] font-mono text-[10px] font-black uppercase tracking-[0.3em] group/link hover:pl-2 transition-all opacity-70 hover:opacity-100"
+                        className="flex items-center justify-between w-full p-1 text-[#00f2ff] font-mono text-[9px] font-black uppercase tracking-[0.4em] group/link hover:pl-2 transition-all opacity-60 hover:opacity-100"
                       >
                         <span>Explorar</span>
-                        <div className="bg-[#00f2ff]/10 p-1.5 rounded-full group-hover/link:bg-[#00f2ff] group-hover/link:text-black transition-all">
-                          <ChevronRight size={14} />
+                        <div className="bg-[#00f2ff]/5 p-1 rounded-full group-hover/link:bg-[#00f2ff] group-hover/link:text-black transition-all">
+                          <ChevronRight size={12} />
                         </div>
                       </a>
                     </div>

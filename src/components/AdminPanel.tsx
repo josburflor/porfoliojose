@@ -55,15 +55,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
   };
 
   const handleSaveProject = async (e: React.FormEvent) => {
-    e.preventDefault(); setIsSaving(true);
+    e.preventDefault();
+    console.log('AdminPanel: Iniciando guardado', editingProject);
+    
+    if (!editingProject.title) {
+      alert('⚠️ El título es obligatorio');
+      return;
+    }
+
     try {
-      const { id, ...data } = editingProject;
-      if (id) await updateDoc(doc(db, 'projects', id), data);
-      else await addDoc(collection(db, 'projects'), { ...data, order: projects.length });
+      const data = { ...editingProject };
+      if (data.tech && typeof data.tech === 'string') {
+        data.tech = (data.tech as string).split(',').map(t => t.trim()).filter(t => t !== '');
+      }
+
+      if (editingProject.id) {
+        console.log('AdminPanel: Actualizando nodo existente', editingProject.id);
+        await updateDoc(doc(db, 'projects', editingProject.id), data);
+        alert('✅ Proyecto modificado correctamente');
+      } else {
+        console.log('AdminPanel: Creando nuevo nodo');
+        await addDoc(collection(db, 'projects'), { ...data, order: projects.length });
+        alert('✅ Nuevo proyecto añadido correctamente');
+      }
+      
       setEditingProject(null);
-      setContMsg({ type: 'success', text: 'ACTUALIZADO' });
-    } catch (err: any) { setContMsg({ type: 'error', text: err.message }); }
-    finally { setIsSaving(false); }
+      setContMsg({ type: 'success', text: 'Sincronización completa' });
+    } catch (err: any) {
+      console.error('AdminPanel: Error crítico en guardado', err);
+      alert('❌ Error al guardar: ' + err.message);
+      setContMsg({ type: 'error', text: err.message });
+    }
   };
 
   const handleSaveService = async (e: React.FormEvent) => {
@@ -73,6 +95,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
       if (id) await updateDoc(doc(db, 'services', id), data);
       else await addDoc(collection(db, 'services'), { ...data, order: services.length });
       setEditingService(null);
+      setContMsg({ type: 'success', text: 'ACTUALIZADO' });
     } catch (err: any) { setContMsg({ type: 'error', text: err.message }); }
     finally { setIsSaving(false); }
   };
@@ -194,6 +217,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   </div>
 
                   <div className="space-y-2">
+                    <label className="text-[9px] font-mono uppercase text-gray-500 tracking-widest">Tecnologías (separadas por coma)</label>
+                    <input type="text" placeholder="React, Node, Firebase" value={Array.isArray(editingProject.tech) ? editingProject.tech.join(', ') : editingProject.tech} onChange={e => setEditingProject({...editingProject, tech: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none" />
+                  </div>
+
+                  <div className="space-y-2">
                     <label className="text-[9px] font-mono uppercase text-gray-500 tracking-widest">Descripción Técnica</label>
                     <textarea placeholder="Describe las tecnologías y el objetivo del proyecto..." value={editingProject.description} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none h-32 resize-none" />
                   </div>
@@ -211,32 +239,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {projects.map(p => (
-                    <div key={p.id} className="bg-white/5 border border-white/10 p-4 flex justify-between items-center group hover:border-[#00f2ff]/30 transition-all">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <img src={p.img} className="w-10 h-10 object-cover grayscale group-hover:grayscale-0 transition-all" />
-                        <div className="overflow-hidden">
-                          <p className="font-bold text-[10px] truncate uppercase">{p.title}</p>
-                          <p className="text-[8px] font-mono text-[#00f2ff]">{p.cat}</p>
+                    <div key={p.id} className="bg-white/5 border border-white/10 p-4 flex flex-col group hover:border-[#00f2ff]/30 transition-all rounded-lg overflow-hidden relative">
+                      <div className="h-40 overflow-hidden mb-4 bg-black/40">
+                        <img src={p.img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={p.title} />
+                      </div>
+                      
+                      {/* Floating Content 'Card' - MAXIMUM TRANSPARENCY (GLASS ONLY) */}
+                      <div className="flex-1 bg-white/[0.02] backdrop-blur-3xl p-4 border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                        <span className="font-mono text-[8px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.6em] opacity-60">{p.cat}</span>
+                        <h3 className="text-md font-black tracking-tighter uppercase mb-4 text-white leading-tight transition-colors drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{p.title}</h3>
+                        
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {p.tech?.map((t: string) => <span key={t} className="text-[7px] font-mono border border-white/5 bg-white/[0.01] px-1.5 py-0.5 rounded-full text-white/20 uppercase tracking-widest">#{t}</span>)}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => {
-                            console.log('AdminPanel: editing project', p);
-                            setEditingProject(p);
-                          }} 
-                          className="p-2.5 bg-white/5 rounded-lg text-white/30 hover:text-[#00f2ff] hover:bg-[#00f2ff]/10 transition-all"
-                          title="Modificar"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete('projects', p.id)} 
-                          className="p-2.5 bg-white/5 rounded-lg text-white/30 hover:text-red-500 hover:bg-red-500/10 transition-all"
-                          title="Eliminar"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+
+                      <div className="flex gap-2 p-2 bg-black/20">
+                        <button type="button" onClick={() => setEditingProject({...p})} className="flex-1 p-2 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[#00f2ff] text-[9px] uppercase font-bold" title="Modificar">Editar</button>
+                        <button type="button" onClick={() => handleDelete('projects', p.id)} className="flex-1 p-2 bg-red-500/5 border border-red-500/20 text-red-500 text-[9px] uppercase font-bold" title="Eliminar">Eliminar</button>
                       </div>
                     </div>
                   ))}
