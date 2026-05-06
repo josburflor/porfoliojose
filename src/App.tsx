@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './AuthContext';
-import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc, updateDoc } from './localDb';
+import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc } from './localDb';
 import { db } from './firebase';
 import { AdminPanel } from './components/AdminPanel';
 import { BACKUP_PROFILE, BACKUP_GENERAL, BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';

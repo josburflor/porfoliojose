@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
-import { doc, updateDoc, setDoc, collection, addDoc, deleteDoc, arrayUnion } from '../localDb';
+import { doc, setDoc, collection, addDoc, deleteDoc, arrayUnion } from '../localDb';
 import { updateEmail, updatePassword } from 'firebase/auth';
 import { X, Plus, Save, Trash2, LogOut, Shield, Key, Edit2, Globe, FileText, Settings, User, CreditCard, MessageSquare, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -75,7 +75,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
 
       if (editingProject.id) {
         console.log('AdminPanel: Actualizando nodo existente', editingProject.id);
-        await updateDoc(doc(db, 'projects', editingProject.id), data);
+        await setDoc(doc(db, 'projects', editingProject.id), data, { merge: true });
         alert('✅ Proyecto modificado correctamente');
       } else {
         console.log('AdminPanel: Creando nuevo nodo');
@@ -99,7 +99,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
     try {
       const { id, ...data } = editingService;
       if (id) {
-        await updateDoc(doc(db, 'services', id), data);
+        await setDoc(doc(db, 'services', id), data, { merge: true });
         alert('✅ Servicio actualizado con éxito');
       } else {
         await addDoc(collection(db, 'services'), { ...data, order: services.length });
@@ -296,7 +296,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                   e.preventDefault(); setIsSaving(true);
                   try {
                     const { id, ...data } = editingSkill;
-                    if (id) await updateDoc(doc(db, 'skills', id), data);
+                    if (id) await setDoc(doc(db, 'skills', id), data, { merge: true });
                     else await addDoc(collection(db, 'skills'), { ...data, order: skills.length });
                     setEditingSkill(null);
                   } catch (err: any) { setContMsg({ type: 'error', text: err.message }); }

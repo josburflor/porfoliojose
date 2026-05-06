@@ -100,11 +100,15 @@ export const updateDoc = async (docRef: any, data: any) => {
   }
 };
 
-export const setDoc = async (docRef: any, data: any) => {
-  if (!docRef.isLocal) return firestoreSetDoc(docRef, data);
+export const setDoc = async (docRef: any, data: any, options?: any) => {
+  if (!docRef.isLocal) return firestoreSetDoc(docRef, data, options);
   const docs = localStore.get(docRef.path);
-  const idx = docs.findIndex((d: any) => d.id === docRef.id);
-  if (idx > -1) docs[idx] = data;
+  const idx = docs.findIndex((d: any) => String(d.id) === String(docRef.id));
+  if (idx > -1) {
+    if (options?.merge) docs[idx] = { ...docs[idx], ...data };
+    else docs[idx] = data;
+  }
+
   else docs.push({ ...data, id: docRef.id });
   localStore.set(docRef.path, docs);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
