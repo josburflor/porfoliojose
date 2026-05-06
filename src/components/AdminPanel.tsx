@@ -3,7 +3,7 @@ import { useAuth } from '../AuthContext';
 import { db } from '../firebase';
 import { doc, setDoc, collection, addDoc, deleteDoc, arrayUnion } from '../localDb';
 import { updateEmail, updatePassword } from 'firebase/auth';
-import { X, Plus, Save, Trash2, LogOut, Shield, Key, Edit2, Globe, FileText, Settings, User, CreditCard, MessageSquare, Star } from 'lucide-react';
+import { X, Plus, Save, Trash2, LogOut, Shield, Key, Edit2, Globe, FileText, Settings, User, CreditCard, MessageSquare, Star, Cloud } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminPanelProps {
@@ -110,6 +110,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
     } catch (err: any) {
       console.error('AdminPanel: Error al guardar servicio', err);
       alert('❌ Error al guardar servicio: ' + err.message);
+      setContMsg({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFullSyncToFirebase = async () => {
+    if (!window.confirm('⚠️ ¿Sincronizar todo con Firebase Cloud? Esto sobrescribirá los datos en la nube con tu versión local/backup actual.')) return;
+    setIsSaving(true);
+    setContMsg({ type: 'info', text: 'INICIANDO SINCRONIZACIÓN CLOUD...' });
+    try {
+      // Sync Collections
+      const syncCol = async (path: string, list: any[]) => {
+        for (const item of list) {
+          const { id, ...data } = item;
+          if (id) await setDoc(doc(db, path, id), data, { merge: true });
+        }
+      };
+
+      await Promise.all([
+        syncCol('projects', projects),
+        syncCol('skills', skills),
+        syncCol('services', services),
+        syncCol('testimonials', testimonials),
+        setDoc(doc(db, 'config', 'general'), genData, { merge: true }),
+        setDoc(doc(db, 'config', 'profile'), profData, { merge: true })
+      ]);
+
+      alert('🚀 ¡ÉXITO! Todos los datos han sido enviados a Firebase Cloud y están sincronizados.');
+      setContMsg({ type: 'success', text: 'SINCRONIZADO CON CLOUD' });
+    } catch (err: any) {
+      console.error('Sync Error:', err);
+      alert('❌ Error en sincronización: ' + err.message);
       setContMsg({ type: 'error', text: err.message });
     } finally {
       setIsSaving(false);
@@ -713,6 +746,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     }`}
                   >
                     {localStorage.getItem('DEV_LOCAL_MODE') === 'true' ? 'Activado: MODO LOCAL' : 'Desactivado: MODO CLOUD'}
+                  </button>
+                </div>
+
+                <div className="p-4 bg-[#00f2ff]/5 border border-[#00f2ff]/20 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-[10px] font-mono text-[#00f2ff] uppercase tracking-widest">Sincronización Cloud (Firebase)</h4>
+                      <p className="text-[8px] text-white/40 uppercase mt-1">Sube todos tus datos locales y backups a la base de datos real en la nube.</p>
+                    </div>
+                    <Cloud className="text-[#00f2ff]/40" size={20} />
+                  </div>
+                  <button 
+                    onClick={handleFullSyncToFirebase}
+                    className="w-full py-3 bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Save size={14} />
+                    Sincronizar todo con Firebase Cloud
                   </button>
                 </div>
                 
