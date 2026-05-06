@@ -72,6 +72,7 @@ export const addDoc = async (coll: any, data: any) => {
 };
 
 export const updateDoc = async (docRef: any, data: any) => {
+  console.log('localDb: updateDoc', docRef.path, docRef.id, data);
   if (!docRef.isLocal) return firestoreUpdateDoc(docRef, data);
   const docs = localStore.get(docRef.path);
   const idx = docs.findIndex((d: any) => d.id === docRef.id);
@@ -80,6 +81,8 @@ export const updateDoc = async (docRef: any, data: any) => {
     localStore.set(docRef.path, docs);
     window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
     triggerSync().catch(() => {}); // Auto-detection
+  } else {
+    console.warn('localDb: Document not found for update', docRef.id);
   }
 };
 
@@ -111,6 +114,7 @@ export const getDocs = async (coll: any) => {
 };
 
 export const deleteDoc = async (docRef: any) => {
+  console.log('localDb: deleteDoc', docRef.path, docRef.id);
   if (!docRef.isLocal) return firestoreDeleteDoc(docRef);
   const docs = localStore.get(docRef.path);
   const filtered = docs.filter((d: any) => d.id !== docRef.id);

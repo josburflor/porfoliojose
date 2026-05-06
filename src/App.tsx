@@ -583,40 +583,51 @@ function AppContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 max-h-[1400px] overflow-y-auto custom-scrollbar scroll-smooth">
             <AnimatePresence mode="popLayout">
               {filtered.map(p => (
-                <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-8 border border-white/10 hover:border-[#00f2ff]/30 transition-all duration-500">
-                  <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-100 transition-all duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-0 border border-white/10 hover:border-[#00f2ff]/30 transition-all duration-700 rounded-xl">
+                  {/* Background Photo */}
+                  <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-100 transition-all duration-1000 group-hover:scale-110" referrerPolicy="no-referrer" />
                   
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-700" />
+                  {/* Vignette Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700" />
                   
+                  {/* Lupa Box (Description) */}
                   {p.description && (
-                    <div className="absolute inset-x-4 top-4 z-20">
-                      <div className="bg-[#00f2ff]/90 backdrop-blur-md border border-[#00f2ff] p-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-[-10px] group-hover:translate-y-0 shadow-[0_0_25px_rgba(0,242,255,0.4)] rounded-tr-3xl">
-                        <div className="flex items-start gap-3">
-                          <div className="bg-black p-2 rounded-full shadow-inner">
-                            <Search size={14} className="text-[#00f2ff]" />
+                    <div className="absolute inset-x-6 top-6 z-30">
+                      <div className="bg-[#00f2ff]/90 backdrop-blur-md border border-[#00f2ff] p-5 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-[-20px] group-hover:translate-y-0 shadow-[0_0_30px_rgba(0,242,255,0.4)] rounded-2xl rounded-tl-none">
+                        <div className="flex items-start gap-4">
+                          <div className="bg-black p-2.5 rounded-xl shadow-inner flex-shrink-0">
+                            <Search size={16} className="text-[#00f2ff]" />
                           </div>
-                          <p className="text-[11px] text-black font-bold leading-relaxed line-clamp-6">
+                          <p className="text-[12px] text-black font-bold leading-relaxed line-clamp-6">
                             {p.description}
                           </p>
                         </div>
                       </div>
                     </div>
                   )}
-
-                  <div className="relative h-full flex flex-col justify-end z-10">
-                    <span className="font-mono text-[11px] font-bold text-[#00f2ff] italic uppercase mb-2 tracking-[0.3em] drop-shadow-md">{p.cat}</span>
-                    <h3 className="text-3xl font-black tracking-tighter uppercase mb-6 drop-shadow-lg leading-none text-white">{p.title}</h3>
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {p.tech.map(t => <span key={t} className="text-[10px] font-mono border border-white/20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-sm drop-shadow-md text-white/70">#{t}</span>)}
+                  
+                  {/* Content Card (Bottom) */}
+                  <div className="absolute inset-x-4 bottom-4 z-20">
+                    <div className="glass-panel p-6 rounded-2xl border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] group-hover:border-[#00f2ff]/40 transition-all duration-500">
+                      <span className="font-mono text-[10px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.4em]">{p.cat}</span>
+                      <h3 className="text-2xl font-black tracking-tighter uppercase mb-4 text-white leading-tight">{p.title}</h3>
+                      
+                      <div className="flex flex-wrap gap-1.5 mb-6">
+                        {p.tech.map(t => <span key={t} className="text-[9px] font-mono border border-white/10 bg-white/5 px-2 py-0.5 rounded-md text-white/50 lowercase">#{t}</span>)}
+                      </div>
+                      
+                      <a 
+                        href={ensureAbsoluteUrl(p.link)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between w-full font-mono text-[11px] text-[#00f2ff] font-bold uppercase tracking-[0.2em] group/btn"
+                      >
+                        <span>Explorar Proyecto</span>
+                        <div className="bg-[#00f2ff]/10 p-2 rounded-lg group-hover/btn:bg-[#00f2ff] group-hover/btn:text-black transition-all">
+                          <ChevronRight size={16} />
+                        </div>
+                      </a>
                     </div>
-                    <a 
-                      href={ensureAbsoluteUrl(p.link)} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 font-mono text-[12px] text-[#00f2ff] font-bold uppercase tracking-[0.2em] hover:gap-4 transition-all drop-shadow-[0_2px_4px_rgba(0,0,0,1)]"
-                    >
-                      Ver_Proyecto <ChevronRight size={18} />
-                    </a>
                   </div>
                 </motion.div>
               ))}
