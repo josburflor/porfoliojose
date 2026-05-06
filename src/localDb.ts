@@ -75,14 +75,14 @@ export const updateDoc = async (docRef: any, data: any) => {
   console.log('localDb: updateDoc', docRef.path, docRef.id, data);
   if (!docRef.isLocal) return firestoreUpdateDoc(docRef, data);
   const docs = localStore.get(docRef.path);
-  const idx = docs.findIndex((d: any) => d.id === docRef.id);
+  const idx = docs.findIndex((d: any) => String(d.id) === String(docRef.id));
   if (idx > -1) {
     docs[idx] = { ...docs[idx], ...data };
     localStore.set(docRef.path, docs);
     window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
     triggerSync().catch(() => {}); // Auto-detection
   } else {
-    console.warn('localDb: Document not found for update', docRef.id);
+    console.warn('localDb: Document not found for update (ID mismatch?)', docRef.id, 'Available IDs:', docs.map((d:any)=>d.id));
   }
 };
 
@@ -117,7 +117,10 @@ export const deleteDoc = async (docRef: any) => {
   console.log('localDb: deleteDoc', docRef.path, docRef.id);
   if (!docRef.isLocal) return firestoreDeleteDoc(docRef);
   const docs = localStore.get(docRef.path);
-  const filtered = docs.filter((d: any) => d.id !== docRef.id);
+  const filtered = docs.filter((d: any) => String(d.id) !== String(docRef.id));
+  if (filtered.length === docs.length) {
+    console.warn('localDb: Document not found for deletion', docRef.id);
+  }
   localStore.set(docRef.path, filtered);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
   triggerSync().catch(() => {});
@@ -129,7 +132,7 @@ export const onSnapshot = (ref: any, callback: (snap: any) => void) => {
   const handler = () => {
     const docs = localStore.get(ref.path || ref.collection?.path);
     if (ref.id) {
-      const d = docs.find((x: any) => x.id === ref.id);
+      const d = docs.find((x: any) => String(x.id) === String(ref.id));
       callback({ exists: () => !!d, data: () => d } as any);
     } else {
       callback({ docs: docs.map((d: any) => ({ id: d.id, data: () => d })) } as any);
