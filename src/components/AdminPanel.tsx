@@ -44,12 +44,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
 
   // Handlers
   const handleUpdateContent = async () => {
+    console.log('AdminPanel: Iniciando actualización de contenido global');
     setIsSaving(true);
     try {
       await setDoc(doc(db, 'config', 'general'), genData, { merge: true });
       await setDoc(doc(db, 'config', 'profile'), profData, { merge: true });
+      alert('✅ Configuración global actualizada y sincronizada');
       setContMsg({ type: 'success', text: 'ACTUALIZADO' });
     } catch (err: any) {
+      console.error('AdminPanel: Error al actualizar contenido', err);
+      alert('❌ Error al actualizar: ' + err.message);
       setContMsg({ type: 'error', text: err.message });
     } finally { setIsSaving(false); }
   };
@@ -465,30 +469,63 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
           {activeTab === 'contenido' && (
             <div className="space-y-12">
               {/* HERO SECTION */}
-              <div className="bg-white/5 border border-white/10 p-8 space-y-8">
-                <h3 className="font-mono text-[10px] text-[#00f2ff] uppercase tracking-widest border-b border-white/10 pb-4">Personalización Hero</h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 1 (Principal)</label>
-                    <input type="text" placeholder="Ej: ARQUITECTO" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+              <div className="bg-white/5 border border-white/10 p-8 space-y-8 rounded-2xl">
+                <div className="flex items-center gap-4 border-b border-white/10 pb-6">
+                  <div className="p-3 bg-[#00f2ff]/10 rounded-xl text-[#00f2ff]">
+                    <Globe size={24} />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Título Línea 2 (Destacado)</label>
-                    <input type="text" placeholder="Ej: DIGITAL" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+                  <div>
+                    <h3 className="font-mono text-[11px] text-white uppercase tracking-[0.3em]">Personalización Hero</h3>
+                    <p className="text-[9px] text-white/30 uppercase mt-1">Configura la primera impresión de tu portafolio</p>
                   </div>
-                  <div className="md:col-span-2 space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Subtítulo Hero (Mensaje de Bienvenida)</label>
-                    <textarea value={genData.heroSubtitle} onChange={e => setGenData({...genData, heroSubtitle: e.target.value})} rows={3} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white resize-none outline-none focus:border-[#00f2ff]" placeholder="Describe tu propuesta de valor..." />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block">Título Principal (Línea 1)</label>
+                    <input type="text" placeholder="Ej: ARQUITECTO" value={genData.heroTitle1} onChange={e => setGenData({...genData, heroTitle1: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff] transition-all rounded-lg" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Video ID o URL (Vimeo/YouTube)</label>
-                    <input type="text" placeholder="Ej: 1185319571" value={genData.heroVideoUrl} onChange={e => setGenData({...genData, heroVideoUrl: e.target.value})} className="w-full bg-black/50 border border-white/10 p-4 text-xs text-white outline-none focus:border-[#00f2ff]" />
+                  
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block">Título Destacado (Línea 2)</label>
+                    <input type="text" placeholder="Ej: DIGITAL" value={genData.heroTitle2} onChange={e => setGenData({...genData, heroTitle2: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 text-xs text-[#00f2ff] font-bold outline-none focus:border-[#00f2ff] transition-all rounded-lg" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-mono text-gray-500 uppercase">Fondo Alternativo (Imagen)</label>
-                    <div className="flex gap-4 items-center bg-black/30 p-4 border border-white/5">
-                      {genData.heroBgImg && <img src={genData.heroBgImg} className="w-12 h-12 object-cover border border-[#00f2ff]/30" />}
-                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} className="text-[9px] text-gray-500 file:bg-[#00f2ff]/10 file:text-[#00f2ff] file:border-0 file:px-3 file:py-1 file:cursor-pointer" />
+
+                  <div className="md:col-span-2 space-y-3">
+                    <label className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block">Mensaje de Introducción (Justificado en Web)</label>
+                    <textarea value={genData.heroSubtitle} onChange={e => setGenData({...genData, heroSubtitle: e.target.value})} rows={4} className="w-full bg-black/40 border border-white/10 p-4 text-xs text-white/80 resize-none outline-none focus:border-[#00f2ff] transition-all rounded-lg leading-relaxed" placeholder="Describe tu visión o propuesta de valor de forma clara..." />
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block">Video Background (YouTube/Vimeo ID)</label>
+                    <div className="relative">
+                      <input type="text" placeholder="Ej: 1185319571" value={genData.heroVideoUrl} onChange={e => setGenData({...genData, heroVideoUrl: e.target.value})} className="w-full bg-black/40 border border-white/10 p-4 pl-12 text-xs text-white outline-none focus:border-[#00f2ff] transition-all rounded-lg" />
+                      <Settings size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" />
+                    </div>
+                    <p className="text-[8px] text-white/20 uppercase italic">Deja en blanco para usar imagen de fondo</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-mono text-gray-400 uppercase tracking-widest block">Imagen de Fondo Alternativa</label>
+                    <div className="flex gap-6 items-center bg-black/40 p-4 border border-white/10 rounded-lg group">
+                      <div className="relative w-16 h-16 bg-white/5 rounded-lg overflow-hidden border border-white/10 flex-shrink-0">
+                        {genData.heroBgImg ? (
+                          <img src={genData.heroBgImg} className="w-full h-full object-cover" alt="Hero Bg" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white/10">
+                            <Plus size={16} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={(e) => handleImageUpload(e, 'hero')} 
+                          className="w-full text-[9px] text-gray-500 file:bg-[#00f2ff]/10 file:text-[#00f2ff] file:border-0 file:px-4 file:py-2 file:rounded-md file:cursor-pointer hover:file:bg-[#00f2ff]/20 transition-all" 
+                        />
+                        <p className="text-[7px] text-white/20 uppercase mt-2">Formatos: JPG, PNG. Máx: 500KB</p>
+                      </div>
                     </div>
                   </div>
                 </div>
