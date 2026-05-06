@@ -67,6 +67,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
       return;
     }
 
+    setIsSaving(true);
     try {
       const data = { ...editingProject };
       if (data.tech && typeof data.tech === 'string') {
@@ -89,6 +90,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
       console.error('AdminPanel: Error crítico en guardado', err);
       alert('❌ Error al guardar: ' + err.message);
       setContMsg({ type: 'error', text: err.message });
+    } finally {
+      setIsSaving(false);
     }
   };
 

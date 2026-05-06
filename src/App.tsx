@@ -238,12 +238,12 @@ function AppContent() {
     };
 
     if (isAdmin) {
-      const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => snap.exists() && setGeneral(snap.data()));
-      const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() && setProfile(snap.data()));
-      const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-      const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-      const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.docs.map(d => ({ id: d.id, ...d.data() }))));
-      const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => snap.exists() ? setGeneral(snap.data()) : setGeneral(BACKUP_GENERAL));
+      const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() ? setProfile(snap.data()) : setProfile(BACKUP_PROFILE));
+      const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.empty ? BACKUP_PROJECTS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.empty ? BACKUP_SKILLS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.empty ? BACKUP_SERVICES : s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.empty ? BACKUP_TESTIMONIALS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubMessages = onSnapshot(query(collection(db, 'messages'), orderBy('date', 'desc')), (s) => setMessages(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       
       return () => {
