@@ -116,6 +116,7 @@ export const deleteDoc = async (docRef: any) => {
   const filtered = docs.filter((d: any) => d.id !== docRef.id);
   localStore.set(docRef.path, filtered);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+  triggerSync().catch(() => {});
 };
 
 export const onSnapshot = (ref: any, callback: (snap: any) => void) => {

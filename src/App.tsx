@@ -23,7 +23,9 @@ import {
   Mail,
   Box,
   LogOut,
-  MessageCircle
+  MessageCircle,
+  Search,
+  Star
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './AuthContext';
@@ -239,10 +241,12 @@ function AppContent() {
       const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() && setProfile(snap.data()));
       const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubMessages = onSnapshot(query(collection(db, 'messages'), orderBy('date', 'desc')), (s) => setMessages(s.docs.map(d => ({ id: d.id, ...d.data() }))));
       
       return () => {
-        unsubGen(); unsubProf(); unsubProjects(); unsubSkills(); unsubMessages();
+        unsubGen(); unsubProf(); unsubProjects(); unsubSkills(); unsubServices(); unsubTestimonials(); unsubMessages();
       };
     } else {
       loadData();
@@ -580,16 +584,21 @@ function AppContent() {
             <AnimatePresence mode="popLayout">
               {filtered.map(p => (
                 <motion.div layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group relative bg-[#080808] aspect-[4/5] overflow-hidden p-8 border border-white/10 hover:border-[#00f2ff]/30 transition-all duration-500">
-                  <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                  <img src={p.img} alt={p.title} className="absolute inset-0 w-full h-full object-cover opacity-100 transition-all duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
                   
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-700" />
                   
                   {p.description && (
                     <div className="absolute inset-x-4 top-4 z-20">
-                      <div className="bg-black/95 backdrop-blur-md border border-[#00f2ff]/30 p-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-[-10px] group-hover:translate-y-0 shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-                        <p className="text-[11px] text-white font-medium leading-relaxed line-clamp-6">
-                          {p.description}
-                        </p>
+                      <div className="bg-[#00f2ff]/90 backdrop-blur-md border border-[#00f2ff] p-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-[-10px] group-hover:translate-y-0 shadow-[0_0_25px_rgba(0,242,255,0.4)] rounded-tr-3xl">
+                        <div className="flex items-start gap-3">
+                          <div className="bg-black p-2 rounded-full shadow-inner">
+                            <Search size={14} className="text-[#00f2ff]" />
+                          </div>
+                          <p className="text-[11px] text-black font-bold leading-relaxed line-clamp-6">
+                            {p.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
