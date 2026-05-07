@@ -21,16 +21,14 @@ import { BACKUP_SERVICES } from './data/servicesBackup';
 const IS_LOCAL_MODE = localStorage.getItem('DEV_LOCAL_MODE') === 'true' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const localStore = {
-  get: (key: string) => {
+  get: (key: string): any[] => {
     const val = localStorage.getItem(`local_db_${key}`);
-    if (!val) {
-      if (key === 'projects') return BACKUP_PROJECTS;
-      if (key === 'skills') return BACKUP_SKILLS;
-      if (key === 'services') return BACKUP_SERVICES;
-      if (key === 'testimonials') return BACKUP_TESTIMONIALS;
-      return [];
+    if (!val) return null as any;
+    try {
+      return JSON.parse(val);
+    } catch (e) {
+      return null as any;
     }
-    return JSON.parse(val);
   },
 
   set: (key: string, data: any) => localStorage.setItem(`local_db_${key}`, JSON.stringify(data))
@@ -44,7 +42,7 @@ export const query = (ref: any, ...constraints: any[]) => {
 };
 
 export const orderBy = (field: string, direction: string = 'asc') => {
-  if (!IS_LOCAL_MODE) return firestoreOrderBy(field, direction);
+  if (!IS_LOCAL_MODE) return firestoreOrderBy(field, direction as any);
   return { type: 'orderBy', field, direction };
 };
 
@@ -78,67 +76,80 @@ export const addDoc = async (coll: any, data: any) => {
   let docs = localStore.get(coll.path);
   if (!Array.isArray(docs)) docs = [];
   const newDoc = { ...data, id: Math.random().toString(36).substr(2, 9) };
-  docs.push(newDoc);
-  localStore.set(coll.path, docs);
+  const newDocs = [...docs, newDoc];
+  localStore.set(coll.path, newDocs);
   window.dispatchEvent(new Event(`local_db_change_${coll.path}`));
-  triggerSync().catch(() => {}); // Auto-detection
+  triggerSync().catch(() => {});
   return newDoc;
 };
 
 export const updateDoc = async (docRef: any, data: any) => {
-  console.log('localDb: updateDoc', docRef.path, docRef.id, data);
   if (!docRef.isLocal) return firestoreUpdateDoc(docRef, data);
-  const docs = localStore.get(docRef.path);
+  let docs = localStore.get(docRef.path);
+  if (!Array.isArray(docs)) return;
   const idx = docs.findIndex((d: any) => String(d.id) === String(docRef.id));
   if (idx > -1) {
-    docs[idx] = { ...docs[idx], ...data };
-    localStore.set(docRef.path, docs);
+    const updatedDocs = [...docs];
+    updatedDocs[idx] = { ...updatedDocs[idx], ...data };
+    localStore.set(docRef.path, updatedDocs);
     window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
-    triggerSync().catch(() => {}); // Auto-detection
-  } else {
-    console.warn('localDb: Document not found for update (ID mismatch?)', docRef.id, 'Available IDs:', docs.map((d:any)=>d.id));
+    triggerSync().catch(() => {});
   }
 };
 
 export const setDoc = async (docRef: any, data: any, options?: any) => {
   if (!docRef.isLocal) return firestoreSetDoc(docRef, data, options);
-  const docs = localStore.get(docRef.path);
+  let docs = localStore.get(docRef.path);
+  if (!Array.isArray(docs)) docs = [];
   const idx = docs.findIndex((d: any) => String(d.id) === String(docRef.id));
+  let newDocs = [...docs];
   if (idx > -1) {
-    if (options?.merge) docs[idx] = { ...docs[idx], ...data };
-    else docs[idx] = data;
+    if (options?.merge) newDocs[idx] = { ...newDocs[idx], ...data };
+    else newDocs[idx] = { ...data, id: docRef.id };
+  } else {
+    newDocs.push({ ...data, id: docRef.id });
   }
-
-  else docs.push({ ...data, id: docRef.id });
-  localStore.set(docRef.path, docs);
+  localStore.set(docRef.path, newDocs);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
-  triggerSync().catch(() => {}); // Auto-detection
+  triggerSync().catch(() => {});
 };
 
 export const getDoc = async (docRef: any) => {
   if (!docRef.isLocal) return firestoreGetDoc(docRef);
-  const docs = localStore.get(docRef.path);
-  const data = docs.find((d: any) => d.id === docRef.id);
-  return { exists: () => !!data, data: () => data } as any;
+  let docs = localStore.get(docRef.path);
+  if (!docs) {
+    if (docRef.path === 'projects') docs = BACKUP_PROJECTS;
+    else if (docRef.path === 'skills') docs = BACKUP_SKILLS;
+    else if (docRef.path === 'services') docs = BACKUP_SERVICES;
+    else if (docRef.path === 'testimonials') docs = BACKUP_TESTIMONIALS;
+    else docs = [];
+  }
+  const d = docs.find((x: any) => String(x.id) === String(docRef.id));
+  return { exists: () => !!d, data: () => d } as any;
 };
 
 export const getDocs = async (coll: any) => {
   if (!coll.isLocal) return firestoreGetDocs(coll);
-  const docs = localStore.get(coll.path);
+  let docs = localStore.get(coll.path);
+  const isEmpty = !docs || docs.length === 0;
+  if (!docs) {
+    if (coll.path === 'projects') docs = BACKUP_PROJECTS;
+    else if (coll.path === 'skills') docs = BACKUP_SKILLS;
+    else if (coll.path === 'services') docs = BACKUP_SERVICES;
+    else if (coll.path === 'testimonials') docs = BACKUP_TESTIMONIALS;
+    else docs = [];
+  }
   return { 
-    empty: docs.length === 0, 
-    docs: docs.map((d: any) => ({ id: d.id, data: () => d })) 
+    empty: isEmpty, 
+    docs: (docs || []).map((d: any) => ({ id: d.id, data: () => d })) 
   } as any;
 };
 
 export const deleteDoc = async (docRef: any) => {
-  console.log('localDb: deleteDoc', docRef.path, docRef.id);
   if (!docRef.isLocal) return firestoreDeleteDoc(docRef);
-  const docs = localStore.get(docRef.path);
+  let docs = localStore.get(docRef.path);
+  if (!Array.isArray(docs)) return;
   const filtered = docs.filter((d: any) => String(d.id) !== String(docRef.id));
-  if (filtered.length === docs.length) {
-    console.warn('localDb: Document not found for deletion', docRef.id);
-  }
   localStore.set(docRef.path, filtered);
   window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
   triggerSync().catch(() => {});
@@ -148,22 +159,33 @@ export const onSnapshot = (ref: any, callback: (snap: any) => void) => {
   if (!ref.isLocal) return firestoreOnSnapshot(ref, callback);
   
   const handler = () => {
-    const docs = localStore.get(ref.path || ref.collection?.path);
+    let docs = localStore.get(ref.path || ref.collection?.path);
+    const isEmpty = !docs || docs.length === 0;
+    if (!docs) {
+      const p = ref.path || ref.collection?.path;
+      if (p === 'projects') docs = BACKUP_PROJECTS;
+      else if (p === 'skills') docs = BACKUP_SKILLS;
+      else if (p === 'services') docs = BACKUP_SERVICES;
+      else if (p === 'testimonials') docs = BACKUP_TESTIMONIALS;
+      else docs = [];
+    }
+
     if (ref.id) {
       const d = docs.find((x: any) => String(x.id) === String(ref.id));
       callback({ exists: () => !!d, data: () => d } as any);
     } else {
-      callback({ docs: docs.map((d: any) => ({ id: d.id, data: () => d })) } as any);
+      callback({ 
+        empty: isEmpty,
+        docs: (docs || []).map((d: any) => ({ id: d.id, data: () => d })) 
+      } as any);
     }
   };
 
   window.addEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
-  
   const storageHandler = (e: StorageEvent) => {
     if (e.key === `local_db_${ref.path || ref.collection?.path}`) handler();
   };
   window.addEventListener('storage', storageHandler);
-
   handler(); 
   return () => {
     window.removeEventListener(`local_db_change_${ref.path || ref.collection?.path}`, handler);
@@ -171,7 +193,6 @@ export const onSnapshot = (ref: any, callback: (snap: any) => void) => {
   };
 };
 
-// --- SYNC ENGINE ---
 export const triggerSync = async () => {
   const allData: Record<string, any> = {};
   for (let i = 0; i < localStorage.length; i++) {
