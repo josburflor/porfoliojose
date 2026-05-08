@@ -75,6 +75,12 @@ export const addDoc = async (coll: any, data: any) => {
   if (!coll.isLocal) return firestoreAddDoc(coll, data);
   let docs = localStore.get(coll.path);
   if (!Array.isArray(docs)) docs = [];
+  // Evitar duplicados por título al crear
+  if (coll.path === 'projects' && data.title) {
+    const existing = docs.find((p: any) => p.title === data.title);
+    if (existing) return { id: existing.id };
+  }
+
   const newDoc = { ...data, id: Math.random().toString(36).substr(2, 9) };
   const newDocs = [...docs, newDoc];
   localStore.set(coll.path, newDocs);
@@ -91,15 +97,17 @@ export const updateDoc = async (docRef: any, data: any) => {
   if (idx > -1) {
     const updatedDocs = [...docs];
     updatedDocs[idx] = { ...updatedDocs[idx], ...data };
-    localStore.set(docRef.path, updatedDocs);
-    window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+    const collPath = docRef.path.split('/')[0];
+    localStore.set(collPath, updatedDocs);
+    window.dispatchEvent(new Event(`local_db_change_${collPath}`));
     triggerSync().catch(() => {});
   }
 };
 
 export const setDoc = async (docRef: any, data: any, options?: any) => {
   if (!docRef.isLocal) return firestoreSetDoc(docRef, data, options);
-  let docs = localStore.get(docRef.path);
+  const collPath = docRef.path;
+  let docs = localStore.get(collPath);
   if (!Array.isArray(docs)) docs = [];
   const idx = docs.findIndex((d: any) => String(d.id) === String(docRef.id));
   let newDocs = [...docs];
@@ -107,10 +115,16 @@ export const setDoc = async (docRef: any, data: any, options?: any) => {
     if (options?.merge) newDocs[idx] = { ...newDocs[idx], ...data };
     else newDocs[idx] = { ...data, id: docRef.id };
   } else {
-    newDocs.push({ ...data, id: docRef.id });
+    if (collPath === 'projects' && data.title) {
+      const dupIdx = newDocs.findIndex((p: any) => p.title === data.title);
+      if (dupIdx > -1) newDocs[dupIdx] = { ...newDocs[dupIdx], ...data, id: docRef.id };
+      else newDocs.push({ ...data, id: docRef.id });
+    } else {
+      newDocs.push({ ...data, id: docRef.id });
+    }
   }
-  localStore.set(docRef.path, newDocs);
-  window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+  localStore.set(collPath, newDocs);
+  window.dispatchEvent(new Event(`local_db_change_${collPath}`));
   triggerSync().catch(() => {});
 };
 
@@ -150,8 +164,9 @@ export const deleteDoc = async (docRef: any) => {
   let docs = localStore.get(docRef.path);
   if (!Array.isArray(docs)) return;
   const filtered = docs.filter((d: any) => String(d.id) !== String(docRef.id));
-  localStore.set(docRef.path, filtered);
-  window.dispatchEvent(new Event(`local_db_change_${docRef.path}`));
+  const collPath = docRef.path.split('/')[0];
+  localStore.set(collPath, filtered);
+  window.dispatchEvent(new Event(`local_db_change_${collPath}`));
   triggerSync().catch(() => {});
 };
 

@@ -189,7 +189,7 @@ function AppContent() {
     // Patrón de recuperación con caché para ahorrar lecturas
     const loadData = async () => {
       const CACHE_KEY = 'josbur_portfolio_data';
-      const CACHE_EXPIRY = 3600000; // 1 hora
+      const CACHE_EXPIRY = 300000; // 5 minutos (reducido para evitar persistencia de errores)
       const now = Date.now();
       
       const cached = localStorage.getItem(CACHE_KEY);
@@ -217,10 +217,14 @@ function AppContent() {
           getDocs(collection(db, 'testimonials'))
         ]);
 
+        const rawProjects = projS.empty ? BACKUP_PROJECTS : projS.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Deduplicación en la carga (visitante)
+        const uniqueProjects = Array.from(new Map(rawProjects.map((item: any) => [item.title, item])).values());
+
         const newData = {
           general: genS.exists() ? genS.data() : BACKUP_GENERAL,
           profile: profS.exists() ? profS.data() : BACKUP_PROFILE,
-          projects: projS.empty ? BACKUP_PROJECTS : projS.docs.map(d => ({ id: d.id, ...d.data() })),
+          projects: uniqueProjects,
           skills: skillS.empty ? BACKUP_SKILLS : skillS.docs.map(d => ({ id: d.id, ...d.data() })),
           services: servS.empty ? BACKUP_SERVICES : servS.docs.map(d => ({ id: d.id, ...d.data() })),
           testimonials: testS.empty ? BACKUP_TESTIMONIALS : testS.docs.map(d => ({ id: d.id, ...d.data() }))
@@ -242,7 +246,12 @@ function AppContent() {
     if (isAdmin) {
       const unsubGen = onSnapshot(doc(db, 'config', 'general'), (snap) => snap.exists() ? setGeneral(snap.data()) : setGeneral(BACKUP_GENERAL));
       const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() ? setProfile(snap.data()) : setProfile(BACKUP_PROFILE));
-      const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => setProjects(s.empty ? BACKUP_PROJECTS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => {
+        const raw = s.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Deduplicación en tiempo real en el estado
+        const unique = Array.from(new Map(raw.map(item => [item.title, item])).values());
+        setProjects(unique.length === 0 ? BACKUP_PROJECTS : unique);
+      });
       const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.empty ? BACKUP_SKILLS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.empty ? BACKUP_SERVICES : s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.empty ? BACKUP_TESTIMONIALS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -273,6 +282,25 @@ function AppContent() {
       migrate();
     }
   }, [isAdmin]);
+
+  // Sistema de Limpieza de Duplicados (Ingeniería de Consistencia)
+  useEffect(() => {
+    if (isAdmin && projects.length > 0) {
+      const titles = new Set();
+      const uniqueProjects = projects.filter(p => {
+        if (!p.title) return true;
+        const isDuplicate = titles.has(p.title);
+        titles.add(p.title);
+        return !isDuplicate;
+      });
+
+      if (uniqueProjects.length < projects.length) {
+        console.log('Detectados duplicados en Proyectos. Limpiando...');
+        localStorage.setItem('local_db_projects', JSON.stringify(uniqueProjects));
+        window.dispatchEvent(new Event('local_db_change_projects'));
+      }
+    }
+  }, [isAdmin, projects]);
 
   const hasCheckedInit = useRef(false);
 

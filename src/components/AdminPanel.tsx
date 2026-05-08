@@ -290,7 +290,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                 </form>
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {projects.map(p => (
+                  {Array.from(new Map(projects.map(p => [p.title, p])).values()).map(p => (
                     <div key={p.id} className="bg-white/5 border border-white/10 p-4 flex flex-col group hover:border-[#00f2ff]/30 transition-all rounded-lg overflow-hidden relative">
                       <div className="h-40 overflow-hidden mb-4 bg-black/40">
                         <img src={p.img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={p.title} />
@@ -760,13 +760,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     </div>
                     <Cloud className="text-[#00f2ff]/40" size={20} />
                   </div>
-                  <button 
-                    onClick={handleFullSyncToFirebase}
-                    className="w-full py-3 bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Save size={14} />
-                    Sincronizar todo con Firebase Cloud
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={handleFullSyncToFirebase}
+                      className="flex-1 py-3 bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[#00f2ff] text-[10px] font-mono uppercase hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Save size={14} />
+                      Sincronizar Cloud
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        if (!window.confirm('⚠️ ¿Eliminar duplicados en la Nube? Esto buscará proyectos con el mismo título en Firestore y dejará solo uno de cada.')) return;
+                        setSecMsg({type:'info', text:'Limpiando duplicados en la nube...'});
+                        try {
+                          const titlesSeen = new Set();
+                          let deletedCount = 0;
+                          // Usamos los proyectos actuales que vienen de la suscripción onSnapshot de App.tsx
+                          for (const p of projects) {
+                            if (titlesSeen.has(p.title)) {
+                              await deleteDoc(doc(db, 'projects', p.id));
+                              deletedCount++;
+                            } else {
+                              titlesSeen.add(p.title);
+                            }
+                          }
+                          setSecMsg({type:'success', text: `Limpieza completada: ${deletedCount} duplicados eliminados.`});
+                          alert(`🚀 Se han eliminado ${deletedCount} proyectos duplicados de la nube.`);
+                        } catch (err: any) {
+                          setSecMsg({type:'error', text: err.message});
+                        }
+                      }}
+                      className="px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-500 text-[10px] font-mono uppercase hover:bg-red-500/20 transition-all flex items-center justify-center"
+                      title="Eliminar duplicados por título"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
                 
                 {localStorage.getItem('DEV_LOCAL_MODE') === 'true' && (
