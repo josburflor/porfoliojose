@@ -78,7 +78,9 @@ function AppContent() {
   const [isSending, setIsSending] = useState(false);
 
   // Data State
-  const [projects, setProjects] = useState<any[]>(BACKUP_PROJECTS);
+  const [projects, setProjects] = useState<any[]>(() => {
+    return Array.from(new Map(BACKUP_PROJECTS.map((item: any) => [item.title?.toString().trim().toLowerCase(), item])).values());
+  });
   const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
   const [services, setServices] = useState<any[]>(BACKUP_SERVICES); 
   const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
