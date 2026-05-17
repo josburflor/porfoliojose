@@ -199,6 +199,9 @@ function AppContent() {
           services,
           testimonials
         },
+        timestamp: Date.now()
+      };
+      
       try {
         localStorage.setItem('josbur_portfolio_data', JSON.stringify(dataToCache));
       } catch (e) {
