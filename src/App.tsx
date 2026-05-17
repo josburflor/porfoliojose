@@ -203,6 +203,7 @@ function AppContent() {
         localStorage.setItem('josbur_portfolio_data', JSON.stringify(dataToCache));
       } catch (e) {
         console.warn('No se pudo guardar la caché (probablemente excedió la cuota de 5MB).', e);
+        localStorage.removeItem('josbur_portfolio_data'); // Auto-curación: elimina la caché pesada
       }
     }
   }, [projects, skills, services, testimonials, general, profile]);
@@ -263,6 +264,7 @@ function AppContent() {
           localStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, timestamp: now }));
         } catch (e) {
           console.warn('Caché excedida al intentar cargar datos', e);
+          localStorage.removeItem(CACHE_KEY); // Auto-curación
         }
       } catch (err) {
         console.warn("Firestore fetch error, using cache/fallback:", err);
@@ -326,6 +328,7 @@ function AppContent() {
           localStorage.setItem('local_db_projects', JSON.stringify(uniqueProjects));
         } catch (e) {
           console.warn('No se pudo guardar local_db_projects', e);
+          localStorage.removeItem('local_db_projects');
         }
         window.dispatchEvent(new Event('local_db_change_projects'));
       }
