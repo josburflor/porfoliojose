@@ -290,28 +290,40 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                 </form>
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Array.from(new Map(projects.map(p => [p.title, p])).values()).map(p => (
-                    <div key={p.id} className="bg-white/5 border border-white/10 p-4 flex flex-col group hover:border-[#00f2ff]/30 transition-all rounded-lg overflow-hidden relative">
-                      <div className="h-40 overflow-hidden mb-4 bg-black/40">
-                        <img src={p.img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={p.title} />
-                      </div>
-                      
-                      {/* Floating Content 'Card' - MAXIMUM TRANSPARENCY (GLASS ONLY) */}
-                      <div className="flex-1 bg-white/[0.02] backdrop-blur-3xl p-4 border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                        <span className="font-mono text-[8px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.6em] opacity-60">{p.cat}</span>
-                        <h3 className="text-md font-black tracking-tighter uppercase mb-4 text-white leading-tight transition-colors drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{p.title}</h3>
+                  {projects.map((p, idx) => {
+                    const isDuplicate = projects.some((other, oIdx) => 
+                      oIdx !== idx && other.title?.toString().trim().toLowerCase() === p.title?.toString().trim().toLowerCase()
+                    );
+                    return (
+                      <div key={p.id} className={`bg-white/5 border ${isDuplicate ? 'border-yellow-500/30' : 'border-white/10'} p-4 flex flex-col group hover:border-[#00f2ff]/30 transition-all rounded-lg overflow-hidden relative`}>
+                        {isDuplicate && (
+                          <div className="absolute top-2 right-2 z-10 bg-yellow-500/20 text-yellow-500 text-[7px] px-2 py-0.5 font-mono uppercase tracking-widest border border-yellow-500/30">
+                            Duplicado detectado
+                          </div>
+                        )}
+                        <div className="h-40 overflow-hidden mb-4 bg-black/40">
+                          <img src={p.img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={p.title} />
+                        </div>
                         
-                        <div className="flex flex-wrap gap-1 mb-4">
-                          {p.tech?.map((t: string) => <span key={t} className="text-[7px] font-mono border border-white/5 bg-white/[0.01] px-1.5 py-0.5 rounded-full text-white/20 uppercase tracking-widest">#{t}</span>)}
+                        <div className="flex-1 bg-white/[0.02] backdrop-blur-3xl p-4 border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                          <div className="flex justify-between items-start">
+                            <span className="font-mono text-[8px] font-black text-[#00f2ff] uppercase mb-1 block tracking-[0.6em] opacity-60">{p.cat}</span>
+                            <span className="text-[6px] font-mono text-white/10">ID: {p.id}</span>
+                          </div>
+                          <h3 className="text-md font-black tracking-tighter uppercase mb-4 text-white leading-tight transition-colors drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{p.title}</h3>
+                          
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {p.tech?.map((t: string) => <span key={t} className="text-[7px] font-mono border border-white/5 bg-white/[0.01] px-1.5 py-0.5 rounded-full text-white/20 uppercase tracking-widest">#{t}</span>)}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 p-2 bg-black/20">
+                          <button type="button" onClick={() => setEditingProject({...p})} className="flex-1 p-2 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[#00f2ff] text-[9px] uppercase font-bold" title="Modificar">Editar</button>
+                          <button type="button" onClick={() => handleDelete('projects', p.id)} className="flex-1 p-2 bg-red-500/5 border border-red-500/20 text-red-500 text-[9px] uppercase font-bold" title="Eliminar">Eliminar</button>
                         </div>
                       </div>
-
-                      <div className="flex gap-2 p-2 bg-black/20">
-                        <button type="button" onClick={() => setEditingProject({...p})} className="flex-1 p-2 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[#00f2ff] text-[9px] uppercase font-bold" title="Modificar">Editar</button>
-                        <button type="button" onClick={() => handleDelete('projects', p.id)} className="flex-1 p-2 bg-red-500/5 border border-red-500/20 text-red-500 text-[9px] uppercase font-bold" title="Eliminar">Eliminar</button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -770,28 +782,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, projects, skill
                     </button>
                     <button 
                       onClick={async () => {
-                        if (!window.confirm('⚠️ ¿Eliminar duplicados en la Nube? Esto buscará proyectos con el mismo título en Firestore y dejará solo uno de cada.')) return;
+                        if (!window.confirm('⚠️ ¿Eliminar duplicados en la Nube? Esto buscará proyectos con el mismo título (ignorando espacios y mayúsculas) en Firestore y dejará solo uno de cada.')) return;
                         setSecMsg({type:'info', text:'Limpiando duplicados en la nube...'});
                         try {
                           const titlesSeen = new Set();
                           let deletedCount = 0;
-                          // Usamos los proyectos actuales que vienen de la suscripción onSnapshot de App.tsx
+                          // Usamos los proyectos actuales
                           for (const p of projects) {
-                            if (titlesSeen.has(p.title)) {
+                            const normalizedTitle = p.title?.toString().trim().toLowerCase();
+                            if (titlesSeen.has(normalizedTitle)) {
+                              console.log(`Eliminando duplicado detectado: ${p.title} (${p.id})`);
                               await deleteDoc(doc(db, 'projects', p.id));
                               deletedCount++;
                             } else {
-                              titlesSeen.add(p.title);
+                              titlesSeen.add(normalizedTitle);
                             }
                           }
                           setSecMsg({type:'success', text: `Limpieza completada: ${deletedCount} duplicados eliminados.`});
-                          alert(`🚀 Se han eliminado ${deletedCount} proyectos duplicados de la nube.`);
+                          alert(`🚀 Se han eliminado ${deletedCount} proyectos duplicados (normalizados) de la nube.`);
                         } catch (err: any) {
                           setSecMsg({type:'error', text: err.message});
                         }
                       }}
                       className="px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-500 text-[10px] font-mono uppercase hover:bg-red-500/20 transition-all flex items-center justify-center"
-                      title="Eliminar duplicados por título"
+                      title="Eliminar duplicados por título (normalizado)"
                     >
                       <Trash2 size={14} />
                     </button>

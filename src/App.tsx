@@ -62,7 +62,8 @@ export default function App() {
 
 function AppContent() {
   const { user, isAdmin, login, resetPassword, logout } = useAuth();
-  
+
+
   // UI State
   const [cat, setCat] = useState('Todos');
   const [open, setOpen] = useState(false);
@@ -185,6 +186,25 @@ function AppContent() {
     }
   };
 
+  // --- Auto-Caching System ---
+  // Sincroniza el estado actual con el localStorage cada vez que algo cambia (Admin o Cloud)
+  useEffect(() => {
+    if (projects.length > 0 || skills.length > 0) {
+      const dataToCache = {
+        data: {
+          general,
+          profile,
+          projects,
+          skills,
+          services,
+          testimonials
+        },
+        timestamp: Date.now()
+      };
+      localStorage.setItem('josbur_portfolio_data', JSON.stringify(dataToCache));
+    }
+  }, [projects, skills, services, testimonials, general, profile]);
+
   useEffect(() => {
     // Patrón de recuperación con caché para ahorrar lecturas
     const loadData = async () => {
@@ -218,8 +238,8 @@ function AppContent() {
         ]);
 
         const rawProjects = projS.empty ? BACKUP_PROJECTS : projS.docs.map(d => ({ id: d.id, ...d.data() }));
-        // Deduplicación en la carga (visitante)
-        const uniqueProjects = Array.from(new Map(rawProjects.map((item: any) => [item.title, item])).values());
+        // Deduplicación en la carga (visitante) - Normalización de títulos para evitar duplicados por espacios o mayúsculas
+        const uniqueProjects = Array.from(new Map(rawProjects.map((item: any) => [item.title?.toString().trim().toLowerCase(), item])).values());
 
         const newData = {
           general: genS.exists() ? genS.data() : BACKUP_GENERAL,
@@ -248,8 +268,8 @@ function AppContent() {
       const unsubProf = onSnapshot(doc(db, 'config', 'profile'), (snap) => snap.exists() ? setProfile(snap.data()) : setProfile(BACKUP_PROFILE));
       const unsubProjects = onSnapshot(collection(db, 'projects'), (s) => {
         const raw = s.docs.map(d => ({ id: d.id, ...d.data() }));
-        // Deduplicación en tiempo real en el estado
-        const unique = Array.from(new Map(raw.map(item => [item.title, item])).values());
+        // Deduplicación en tiempo real en el estado - Normalización agresiva
+        const unique = Array.from(new Map(raw.map(item => [item.title?.toString().trim().toLowerCase(), item])).values());
         setProjects(unique.length === 0 ? BACKUP_PROJECTS : unique);
       });
       const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.empty ? BACKUP_SKILLS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -917,32 +937,6 @@ function AppContent() {
         </div>
       </section>
 
-      {/* Instagram Grid */}
-      <section id="instagram" className="py-24 px-8 border border-[#00f2ff]/30 mx-4 md:mx-8 my-12 rounded-[2rem] shadow-[0_0_30px_rgba(0,242,255,0.05)] bg-black/20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4 uppercase tracking-tighter">
-              Galería <span className="text-[#00f2ff]">Social</span>
-            </h2>
-            <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.3em]">Instagram Feed</p>
-          </div>
-          <div className="max-w-4xl mx-auto overflow-hidden rounded-xl border border-white/10 min-h-[300px] flex items-center justify-center">
-            <div className="elfsight-app-6d3f75bd-8c4c-4763-8b6b-dea67d865dee w-full" data-elfsight-app-lazy></div>
-          </div>
-          <div className="mt-12 text-center">
-            <a 
-              href="https://www.instagram.com/burgosdiseno/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 cyber-button"
-            >
-              <Instagram size={18} />
-              Seguir en Instagram
-            </a>
-          </div>
-        </div>
-      </section>
-
       <section id="contacto" className="py-32 px-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-tr from-[#00f2ff]/5 via-transparent to-[#00f2ff]/5 pointer-events-none" />
         
@@ -1014,6 +1008,7 @@ function AppContent() {
                   </motion.div>
                 ) : (
                   <form 
+                    action="javascript:void(0)"
                     onSubmit={async (e) => {
                       e.preventDefault();
                       setIsSending(true);
