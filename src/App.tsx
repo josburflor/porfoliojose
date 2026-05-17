@@ -199,9 +199,11 @@ function AppContent() {
           services,
           testimonials
         },
-        timestamp: Date.now()
-      };
-      localStorage.setItem('josbur_portfolio_data', JSON.stringify(dataToCache));
+      try {
+        localStorage.setItem('josbur_portfolio_data', JSON.stringify(dataToCache));
+      } catch (e) {
+        console.warn('No se pudo guardar la caché (probablemente excedió la cuota de 5MB).', e);
+      }
     }
   }, [projects, skills, services, testimonials, general, profile]);
 
@@ -257,7 +259,11 @@ function AppContent() {
         setServices(newData.services);
         setTestimonials(newData.testimonials);
         
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, timestamp: now }));
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, timestamp: now }));
+        } catch (e) {
+          console.warn('Caché excedida al intentar cargar datos', e);
+        }
       } catch (err) {
         console.warn("Firestore fetch error, using cache/fallback:", err);
       }
@@ -316,7 +322,11 @@ function AppContent() {
 
       if (uniqueProjects.length < projects.length) {
         console.log('Detectados duplicados en Proyectos. Limpiando...');
-        localStorage.setItem('local_db_projects', JSON.stringify(uniqueProjects));
+        try {
+          localStorage.setItem('local_db_projects', JSON.stringify(uniqueProjects));
+        } catch (e) {
+          console.warn('No se pudo guardar local_db_projects', e);
+        }
         window.dispatchEvent(new Event('local_db_change_projects'));
       }
     }
