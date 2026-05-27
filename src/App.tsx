@@ -81,16 +81,19 @@ function AppContent() {
   const [projects, setProjects] = useState<any[]>(() => {
     return Array.from(new Map(BACKUP_PROJECTS.map((item: any) => [item.title?.toString().trim().toLowerCase(), item])).values());
   });
-  const [skills, setSkills] = useState<any[]>(BACKUP_SKILLS);
+  const [skills, setSkills] = useState<any[]>(() => {
+    return Array.from(new Map(BACKUP_SKILLS.map((item: any) => [item.name?.toString().trim().toLowerCase(), item])).values());
+  });
   const [services, setServices] = useState<any[]>(BACKUP_SERVICES); 
   const [testimonials, setTestimonials] = useState<any[]>(BACKUP_TESTIMONIALS);
   const [messages, setMessages] = useState<any[]>([]);
   const [general, setGeneral] = useState<any>(BACKUP_GENERAL);
   const [profile, setProfile] = useState(BACKUP_PROFILE);
 
-  // Memoized Values
   const visibleSkills = useMemo(() => {
-    return (skills || []).filter(s => !general?.hiddenIds?.includes(s.id));
+    const rawSkills = skills || [];
+    const unique = Array.from(new Map(rawSkills.map((item: any) => [item.name?.toString().trim().toLowerCase(), item])).values());
+    return (unique as any[]).filter(s => !general?.hiddenIds?.includes(s.id));
   }, [skills, general?.hiddenIds]);
 
   const visibleProjects = useMemo(() => {
