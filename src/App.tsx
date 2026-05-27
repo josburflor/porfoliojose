@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './AuthContext';
-import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc, updateDoc } from './localDb';
+import { collection, onSnapshot, query, orderBy, doc, getDocs, getDoc, setDoc, addDoc, updateDoc, deleteDoc } from './localDb';
 import { db } from './firebase';
 import { AdminPanel } from './components/AdminPanel';
 import { BACKUP_PROFILE, BACKUP_GENERAL, BACKUP_PROJECTS, BACKUP_SKILLS, BACKUP_TESTIMONIALS } from './data/backup';
@@ -249,11 +249,15 @@ function AppContent() {
         // Deduplicación en la carga (visitante) - Normalización de títulos para evitar duplicados por espacios o mayúsculas
         const uniqueProjects = Array.from(new Map(rawProjects.map((item: any) => [item.title?.toString().trim().toLowerCase(), item])).values());
 
+        const rawSkills = skillS.empty ? BACKUP_SKILLS : skillS.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Deduplicación en la carga - Normalización de nombres para evitar duplicados por espacios o mayúsculas
+        const uniqueSkills = Array.from(new Map(rawSkills.map((item: any) => [item.name?.toString().trim().toLowerCase(), item])).values());
+
         const newData = {
           general: genS.exists() ? genS.data() : BACKUP_GENERAL,
           profile: profS.exists() ? profS.data() : BACKUP_PROFILE,
           projects: uniqueProjects,
-          skills: skillS.empty ? BACKUP_SKILLS : skillS.docs.map(d => ({ id: d.id, ...d.data() })),
+          skills: uniqueSkills,
           services: servS.empty ? BACKUP_SERVICES : servS.docs.map(d => ({ id: d.id, ...d.data() })),
           testimonials: testS.empty ? BACKUP_TESTIMONIALS : testS.docs.map(d => ({ id: d.id, ...d.data() }))
         };
@@ -285,7 +289,12 @@ function AppContent() {
         const unique = Array.from(new Map(raw.map(item => [item.title?.toString().trim().toLowerCase(), item])).values());
         setProjects(unique.length === 0 ? BACKUP_PROJECTS : unique);
       });
-      const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => setSkills(s.empty ? BACKUP_SKILLS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
+      const unsubSkills = onSnapshot(collection(db, 'skills'), (s) => {
+        const raw = s.empty ? BACKUP_SKILLS : s.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Deduplicación en tiempo real en el estado - Normalización de nombres
+        const unique = Array.from(new Map(raw.map(item => [item.name?.toString().trim().toLowerCase(), item])).values());
+        setSkills(unique);
+      });
       const unsubServices = onSnapshot(collection(db, 'services'), (s) => setServices(s.empty ? BACKUP_SERVICES : s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubTestimonials = onSnapshot(collection(db, 'testimonials'), (s) => setTestimonials(s.empty ? BACKUP_TESTIMONIALS : s.docs.map(d => ({ id: d.id, ...d.data() }))));
       const unsubMessages = onSnapshot(query(collection(db, 'messages'), orderBy('date', 'desc')), (s) => setMessages(s.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -339,6 +348,39 @@ function AppContent() {
       }
     }
   }, [isAdmin, projects]);
+
+  // Sistema de Limpieza de Duplicados en Habilidades (Ingeniería de Consistencia)
+  useEffect(() => {
+    if (isAdmin && skills.length > 0) {
+      const names = new Set();
+      const duplicatesToDelete: any[] = [];
+      
+      skills.forEach(s => {
+        if (!s.name) return;
+        const normalized = s.name.toString().trim().toLowerCase();
+        if (names.has(normalized)) {
+          duplicatesToDelete.push(s);
+        } else {
+          names.add(normalized);
+        }
+      });
+
+      if (duplicatesToDelete.length > 0) {
+        console.log('Detectados duplicados en Habilidades. Limpiando...', duplicatesToDelete);
+        const cleanUp = async () => {
+          for (const s of duplicatesToDelete) {
+            try {
+              await deleteDoc(doc(db, 'skills', s.id));
+              console.log(`Eliminado duplicado de habilidad: ${s.name} (${s.id})`);
+            } catch (err) {
+              console.error(`Error al eliminar habilidad duplicada ${s.id}:`, err);
+            }
+          }
+        };
+        cleanUp();
+      }
+    }
+  }, [isAdmin, skills]);
 
   const hasCheckedInit = useRef(false);
 

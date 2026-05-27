@@ -75,9 +75,13 @@ export const addDoc = async (coll: any, data: any) => {
   if (!coll.isLocal) return firestoreAddDoc(coll, data);
   let docs = localStore.get(coll.path);
   if (!Array.isArray(docs)) docs = [];
-  // Evitar duplicados por título al crear
+  // Evitar duplicados por título o nombre al crear
   if (coll.path === 'projects' && data.title) {
     const existing = docs.find((p: any) => p.title === data.title);
+    if (existing) return { id: existing.id };
+  }
+  if (coll.path === 'skills' && data.name) {
+    const existing = docs.find((s: any) => s.name?.toString().trim().toLowerCase() === data.name?.toString().trim().toLowerCase());
     if (existing) return { id: existing.id };
   }
 
@@ -117,6 +121,10 @@ export const setDoc = async (docRef: any, data: any, options?: any) => {
   } else {
     if (collPath === 'projects' && data.title) {
       const dupIdx = newDocs.findIndex((p: any) => p.title === data.title);
+      if (dupIdx > -1) newDocs[dupIdx] = { ...newDocs[dupIdx], ...data, id: docRef.id };
+      else newDocs.push({ ...data, id: docRef.id });
+    } else if (collPath === 'skills' && data.name) {
+      const dupIdx = newDocs.findIndex((s: any) => s.name?.toString().trim().toLowerCase() === data.name?.toString().trim().toLowerCase());
       if (dupIdx > -1) newDocs[dupIdx] = { ...newDocs[dupIdx], ...data, id: docRef.id };
       else newDocs.push({ ...data, id: docRef.id });
     } else {
